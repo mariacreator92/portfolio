@@ -1,15 +1,15 @@
 const translations = {
   en: {
-    "nav.glance": "Life",
-    "nav.boxes": "Projects",
-    "nav.work": "Work",
-    "nav.bag": "Skills",
-    "hero.hi": "hi, I'm",
-    "hero.lead": "A short line about what you do will go here.",
+    "g.exhibit": "Exhibition:",
+    "g.exhibitVal": "Portfolio",
+    "g.year": "Year:",
+    "g.hint": "Click a frame to step inside.",
+    "room.label": "Room",
+    "room.back": "← Back to the gallery",
+    "room.next": "Next room →",
     "glance.title": "My life at a glance",
     "platforms.title": "Platforms I use",
     "boxes.title": "Open the boxes",
-    "boxes.hint": "click to open ↓",
     "boxes.cover": "Cover letter",
     "boxes.coverText": "Why I'd love to work with you.",
     "boxes.read": "Read it →",
@@ -31,19 +31,18 @@ const translations = {
     "bag.s4": "Content creation",
     "bag.s5": "Design",
     "bag.s6": "Languages",
-    "footer": "made with care",
   },
   pt: {
-    "nav.glance": "Vida",
-    "nav.boxes": "Projetos",
-    "nav.work": "Trabalho",
-    "nav.bag": "Skills",
-    "hero.hi": "olá, sou a",
-    "hero.lead": "Aqui vai uma frase curta sobre o que fazes.",
+    "g.exhibit": "Exposição:",
+    "g.exhibitVal": "Portfólio",
+    "g.year": "Ano:",
+    "g.hint": "Clica numa moldura para entrar.",
+    "room.label": "Sala",
+    "room.back": "← Voltar à galeria",
+    "room.next": "Próxima sala →",
     "glance.title": "A minha vida num relance",
     "platforms.title": "Plataformas que uso",
     "boxes.title": "Abre as caixas",
-    "boxes.hint": "clica para abrir ↓",
     "boxes.cover": "Carta de apresentação",
     "boxes.coverText": "Porque adorava trabalhar contigo.",
     "boxes.read": "Ler →",
@@ -65,7 +64,6 @@ const translations = {
     "bag.s4": "Criação de conteúdo",
     "bag.s5": "Design",
     "bag.s6": "Línguas",
-    "footer": "feito com carinho",
   },
 };
 
@@ -90,11 +88,28 @@ let saved = null;
 try { saved = localStorage.getItem("lang"); } catch {}
 setLang(saved || (navigator.language.startsWith("pt") ? "pt" : "en"));
 
+// Gallery ↔ rooms: the URL hash decides which room is open
+const rooms = ["glance", "platforms", "boxes", "work", "bag"];
+const gallery = document.getElementById("gallery");
+const roomNav = document.querySelector(".room-nav");
+const next = document.getElementById("next");
+
+function show() {
+  const id = location.hash.slice(1);
+  const current = rooms.includes(id) ? id : null;
+  gallery.hidden = !!current;
+  roomNav.hidden = !current;
+  rooms.forEach((r) => (document.getElementById(r).hidden = r !== current));
+  if (current) next.href = "#" + rooms[(rooms.indexOf(current) + 1) % rooms.length];
+  window.scrollTo({ top: 0, behavior: "instant" });
+}
+window.addEventListener("hashchange", show);
+show();
+
 // Boxes: open/close
 document.querySelectorAll(".box .lid").forEach((lid) => {
   lid.addEventListener("click", () => {
-    const box = lid.parentElement;
-    const open = box.classList.toggle("open");
+    const open = lid.parentElement.classList.toggle("open");
     lid.setAttribute("aria-expanded", open);
   });
 });
