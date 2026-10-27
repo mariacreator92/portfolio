@@ -3,21 +3,21 @@
 <head>
   <meta charset="utf-8">
   <meta name="viewport" content="width=device-width, initial-scale=1">
-  <title>Leonor Chambel — Portfolio</title>
-  <meta name="description" content="Leonor Chambel's portfolio.">
+  <title>Leonor — Portfolio</title>
+  <meta name="description" content="Leonor's portfolio.">
   <link rel="preconnect" href="https://fonts.googleapis.com">
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-  <link href="https://fonts.googleapis.com/css2?family=Fraunces:opsz,wght@9..144,400;9..144,600&family=Inter:wght@400;500&display=swap" rel="stylesheet">
+  <link href="https://fonts.googleapis.com/css2?family=Bricolage+Grotesque:opsz,wght@12..96,400;12..96,700;12..96,800&family=DM+Sans:wght@400;500;700&family=Caveat:wght@600&display=swap" rel="stylesheet">
   <link rel="stylesheet" href="style.css">
 </head>
 <body>
   <header class="nav">
-    <a href="#" class="logo">Leonor Chambel</a>
+    <a href="#" class="logo">Leonor<span>.</span></a>
     <nav>
-      <a href="#projects" data-i18n="nav.projects">Projects</a>
-      <a href="#about" data-i18n="nav.about">About</a>
-      <a href="#experience" data-i18n="nav.experience">Experience</a>
-      <a href="#contact" data-i18n="nav.contact">Contact</a>
+      <a href="#glance" data-i18n="nav.glance">Life</a>
+      <a href="#boxes" data-i18n="nav.boxes">Projects</a>
+      <a href="#work" data-i18n="nav.work">Work</a>
+      <a href="#bag" data-i18n="nav.bag">Skills</a>
       <div class="lang" role="group" aria-label="Language">
         <button type="button" data-lang="en">EN</button>
         <button type="button" data-lang="pt">PT</button>
@@ -26,67 +26,100 @@
   </header>
 
   <main>
+    <!-- 1. Name -->
     <section class="hero">
-      <p class="eyebrow" data-i18n="hero.eyebrow">Portfolio · 2026</p>
-      <h1 data-i18n="hero.title">Hi, I'm Leonor.<br><em>I make things with care.</em></h1>
-      <p class="lead" data-i18n="hero.lead">Write a short line here about what you do and who you do it for.</p>
+      <p class="scribble" data-i18n="hero.hi">hi, I'm</p>
+      <h1>Leonor<span class="dot">.</span></h1>
+      <p class="lead" data-i18n="hero.lead">A short line about what you do will go here.</p>
+      <div class="blob b1"></div><div class="blob b2"></div><div class="blob b3"></div>
     </section>
 
-    <section id="projects">
-      <h2 data-i18n="projects.title">Projects</h2>
-      <div class="grid">
-        <article class="card">
-          <div class="thumb"></div>
-          <h3 data-i18n="projects.name">Project name</h3>
-          <p data-i18n="projects.desc">One or two sentences about the project and your role.</p>
-        </article>
-        <article class="card">
-          <div class="thumb"></div>
-          <h3 data-i18n="projects.name">Project name</h3>
-          <p data-i18n="projects.desc">One or two sentences about the project and your role.</p>
-        </article>
-        <article class="card">
-          <div class="thumb"></div>
-          <h3 data-i18n="projects.name">Project name</h3>
-          <p data-i18n="projects.desc">One or two sentences about the project and your role.</p>
-        </article>
-        <article class="card">
-          <div class="thumb"></div>
-          <h3 data-i18n="projects.name">Project name</h3>
-          <p data-i18n="projects.desc">One or two sentences about the project and your role.</p>
-        </article>
-      </div>
+    <!-- 2. Life at a glance -->
+    <section id="glance">
+      <h2><span data-i18n="glance.title">My life at a glance</span> <span class="star">✶</span></h2>
+      <!-- Para pôr fotos: troca <div class="pic"></div> por <img class="pic" src="photos/1.jpg" alt=""> -->
+      <div class="mosaic" id="mosaic"></div>
     </section>
 
-    <section id="about" class="split">
-      <h2 data-i18n="about.title">About me</h2>
-      <div>
-        <p data-i18n="about.p1">Tell a bit of your story here: what drives you, how you work, what sets you apart.</p>
-        <p data-i18n="about.p2">A second paragraph about your interests, background or the kind of work you're looking for.</p>
-      </div>
-    </section>
-
-    <section id="experience" class="split">
-      <h2 data-i18n="experience.title">Experience</h2>
-      <ul class="timeline">
-        <li><span data-i18n="experience.now">2024 — now</span><strong data-i18n="experience.role">Role</strong> · <span class="org" data-i18n="experience.company">Company</span></li>
-        <li><span>2022 — 2024</span><strong data-i18n="experience.role">Role</strong> · <span class="org" data-i18n="experience.company">Company</span></li>
-        <li><span>2019 — 2022</span><strong data-i18n="experience.degree">Degree</strong> · <span class="org" data-i18n="experience.uni">University</span></li>
+    <!-- 3. Platforms -->
+    <section id="platforms">
+      <h2 data-i18n="platforms.title">Platforms I use</h2>
+      <ul class="logos">
+        <li><img src="https://cdn.jsdelivr.net/npm/simple-icons@11.0.0/icons/figma.svg" alt="">Figma</li>
+        <li><img src="https://cdn.jsdelivr.net/npm/simple-icons@11.0.0/icons/canva.svg" alt="">Canva</li>
+        <li><img src="https://cdn.jsdelivr.net/npm/simple-icons@11.0.0/icons/notion.svg" alt="">Notion</li>
+        <li><img src="https://cdn.jsdelivr.net/npm/simple-icons@11.0.0/icons/instagram.svg" alt="">Instagram</li>
+        <li><img src="https://cdn.jsdelivr.net/npm/simple-icons@11.0.0/icons/tiktok.svg" alt="">TikTok</li>
+        <li><img src="https://cdn.jsdelivr.net/npm/simple-icons@11.0.0/icons/pinterest.svg" alt="">Pinterest</li>
+        <li><img src="https://cdn.jsdelivr.net/npm/simple-icons@11.0.0/icons/spotify.svg" alt="">Spotify</li>
+        <li><img src="https://cdn.jsdelivr.net/npm/simple-icons@11.0.0/icons/googledrive.svg" alt="">Google Drive</li>
       </ul>
     </section>
 
-    <section id="contact" class="contact">
-      <h2 data-i18n="contact.title">Let's talk?</h2>
-      <p class="lead" data-i18n="contact.lead">Find me on any of these.</p>
-      <div class="social">
-        <a href="#">Instagram</a>
-        <a href="#">LinkedIn</a>
-        <a href="https://github.com/mariacreator92">GitHub</a>
+    <!-- 4. Boxes to open -->
+    <section id="boxes">
+      <h2 data-i18n="boxes.title">Open the boxes</h2>
+      <p class="hint" data-i18n="boxes.hint">click to open ↓</p>
+      <div class="boxes">
+        <div class="box yellow">
+          <button class="lid" aria-expanded="false"><span data-i18n="boxes.cover">Cover letter</span><span class="plus">+</span></button>
+          <div class="inside"><p data-i18n="boxes.coverText">Why I'd love to work with you.</p><a href="#" class="btn" data-i18n="boxes.read">Read it →</a></div>
+        </div>
+        <div class="box blue">
+          <button class="lid" aria-expanded="false"><span>LinkedIn</span><span class="plus">+</span></button>
+          <div class="inside"><p data-i18n="boxes.linkedinText">Let's connect.</p><a href="#" class="btn" data-i18n="boxes.visit">Visit →</a></div>
+        </div>
+        <div class="box pink">
+          <button class="lid" aria-expanded="false"><span data-i18n="boxes.resume">Resume</span><span class="plus">+</span></button>
+          <div class="inside"><p data-i18n="boxes.resumeText">My experience, all on one page.</p><a href="#" class="btn" data-i18n="boxes.download">Open →</a></div>
+        </div>
+        <div class="box green">
+          <button class="lid" aria-expanded="false"><span data-i18n="boxes.project">Project</span> 01<span class="plus">+</span></button>
+          <div class="inside"><p data-i18n="boxes.projectText">A short description of the project.</p><a href="#" class="btn" data-i18n="boxes.see">See it →</a></div>
+        </div>
+        <div class="box orange">
+          <button class="lid" aria-expanded="false"><span data-i18n="boxes.project">Project</span> 02<span class="plus">+</span></button>
+          <div class="inside"><p data-i18n="boxes.projectText">A short description of the project.</p><a href="#" class="btn" data-i18n="boxes.see">See it →</a></div>
+        </div>
+        <div class="box purple">
+          <button class="lid" aria-expanded="false"><span data-i18n="boxes.project">Project</span> 03<span class="plus">+</span></button>
+          <div class="inside"><p data-i18n="boxes.projectText">A short description of the project.</p><a href="#" class="btn" data-i18n="boxes.see">See it →</a></div>
+        </div>
+      </div>
+    </section>
+
+    <!-- 5. Photo + my work -->
+    <section id="work" class="work">
+      <div class="photo"><span data-i18n="work.photo">your photo here</span></div>
+      <div>
+        <h2 data-i18n="work.title">My work</h2>
+        <ul class="worklist">
+          <li><a href="#"><span data-i18n="work.item">Work title</span> <em>2026</em><b>↗</b></a></li>
+          <li><a href="#"><span data-i18n="work.item">Work title</span> <em>2025</em><b>↗</b></a></li>
+          <li><a href="#"><span data-i18n="work.item">Work title</span> <em>2025</em><b>↗</b></a></li>
+          <li><a href="#"><span data-i18n="work.item">Work title</span> <em>2024</em><b>↗</b></a></li>
+        </ul>
+      </div>
+    </section>
+
+    <!-- 6. What's in my bag -->
+    <section id="bag" class="bag">
+      <h2 data-i18n="bag.title">What's in my bag</h2>
+      <div class="bagwrap">
+        <div class="bagicon">👜</div>
+        <ul class="items">
+          <li class="yellow">✏️ <span data-i18n="bag.s1">Creativity</span></li>
+          <li class="pink">💬 <span data-i18n="bag.s2">Communication</span></li>
+          <li class="blue">🗂️ <span data-i18n="bag.s3">Organisation</span></li>
+          <li class="green">📸 <span data-i18n="bag.s4">Content creation</span></li>
+          <li class="orange">🎨 <span data-i18n="bag.s5">Design</span></li>
+          <li class="purple">🌍 <span data-i18n="bag.s6">Languages</span></li>
+        </ul>
       </div>
     </section>
   </main>
 
-  <footer>© 2026 Leonor Chambel</footer>
+  <footer>© 2026 Leonor · <span data-i18n="footer">made with care</span></footer>
 
   <script src="i18n.js"></script>
 </body>

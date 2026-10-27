@@ -1,49 +1,71 @@
 const translations = {
   en: {
-    "nav.projects": "Projects",
-    "nav.about": "About",
-    "nav.experience": "Experience",
-    "nav.contact": "Contact",
-    "hero.eyebrow": "Portfolio · 2026",
-    "hero.title": "Hi, I'm Leonor.<br><em>I make things with care.</em>",
-    "hero.lead": "Write a short line here about what you do and who you do it for.",
-    "projects.title": "Projects",
-    "projects.name": "Project name",
-    "projects.desc": "One or two sentences about the project and your role.",
-    "about.title": "About me",
-    "about.p1": "Tell a bit of your story here: what drives you, how you work, what sets you apart.",
-    "about.p2": "A second paragraph about your interests, background or the kind of work you're looking for.",
-    "experience.title": "Experience",
-    "experience.now": "2024 — now",
-    "experience.role": "Role",
-    "experience.company": "Company",
-    "experience.degree": "Degree",
-    "experience.uni": "University",
-    "contact.title": "Let's talk?",
-    "contact.lead": "Find me on any of these.",
+    "nav.glance": "Life",
+    "nav.boxes": "Projects",
+    "nav.work": "Work",
+    "nav.bag": "Skills",
+    "hero.hi": "hi, I'm",
+    "hero.lead": "A short line about what you do will go here.",
+    "glance.title": "My life at a glance",
+    "platforms.title": "Platforms I use",
+    "boxes.title": "Open the boxes",
+    "boxes.hint": "click to open ↓",
+    "boxes.cover": "Cover letter",
+    "boxes.coverText": "Why I'd love to work with you.",
+    "boxes.read": "Read it →",
+    "boxes.linkedinText": "Let's connect.",
+    "boxes.visit": "Visit →",
+    "boxes.resume": "Resume",
+    "boxes.resumeText": "My experience, all on one page.",
+    "boxes.download": "Open →",
+    "boxes.project": "Project",
+    "boxes.projectText": "A short description of the project.",
+    "boxes.see": "See it →",
+    "work.photo": "your photo here",
+    "work.title": "My work",
+    "work.item": "Work title",
+    "bag.title": "What's in my bag",
+    "bag.s1": "Creativity",
+    "bag.s2": "Communication",
+    "bag.s3": "Organisation",
+    "bag.s4": "Content creation",
+    "bag.s5": "Design",
+    "bag.s6": "Languages",
+    "footer": "made with care",
   },
   pt: {
-    "nav.projects": "Projetos",
-    "nav.about": "Sobre",
-    "nav.experience": "Experiência",
-    "nav.contact": "Contacto",
-    "hero.eyebrow": "Portfólio · 2026",
-    "hero.title": "Olá, sou a Leonor.<br><em>Crio coisas com cuidado.</em>",
-    "hero.lead": "Escreve aqui uma frase curta sobre o que fazes e para quem.",
-    "projects.title": "Projetos",
-    "projects.name": "Nome do projeto",
-    "projects.desc": "Uma ou duas frases sobre o projeto e o teu papel.",
-    "about.title": "Sobre mim",
-    "about.p1": "Conta aqui um pouco da tua história: o que te motiva, como trabalhas, o que te distingue.",
-    "about.p2": "Um segundo parágrafo com interesses, formação ou o tipo de trabalho que procuras.",
-    "experience.title": "Experiência",
-    "experience.now": "2024 — hoje",
-    "experience.role": "Cargo",
-    "experience.company": "Empresa",
-    "experience.degree": "Curso",
-    "experience.uni": "Universidade",
-    "contact.title": "Vamos falar?",
-    "contact.lead": "Encontra-me aqui.",
+    "nav.glance": "Vida",
+    "nav.boxes": "Projetos",
+    "nav.work": "Trabalho",
+    "nav.bag": "Skills",
+    "hero.hi": "olá, sou a",
+    "hero.lead": "Aqui vai uma frase curta sobre o que fazes.",
+    "glance.title": "A minha vida num relance",
+    "platforms.title": "Plataformas que uso",
+    "boxes.title": "Abre as caixas",
+    "boxes.hint": "clica para abrir ↓",
+    "boxes.cover": "Carta de apresentação",
+    "boxes.coverText": "Porque adorava trabalhar contigo.",
+    "boxes.read": "Ler →",
+    "boxes.linkedinText": "Vamos ligar-nos.",
+    "boxes.visit": "Visitar →",
+    "boxes.resume": "Currículo",
+    "boxes.resumeText": "A minha experiência numa página.",
+    "boxes.download": "Abrir →",
+    "boxes.project": "Projeto",
+    "boxes.projectText": "Uma descrição curta do projeto.",
+    "boxes.see": "Ver →",
+    "work.photo": "a tua foto aqui",
+    "work.title": "O meu trabalho",
+    "work.item": "Título do trabalho",
+    "bag.title": "O que há na minha mala",
+    "bag.s1": "Criatividade",
+    "bag.s2": "Comunicação",
+    "bag.s3": "Organização",
+    "bag.s4": "Criação de conteúdo",
+    "bag.s5": "Design",
+    "bag.s6": "Línguas",
+    "footer": "feito com carinho",
   },
 };
 
@@ -67,3 +89,25 @@ document.querySelectorAll("[data-lang]").forEach((btn) => {
 let saved = null;
 try { saved = localStorage.getItem("lang"); } catch {}
 setLang(saved || (navigator.language.startsWith("pt") ? "pt" : "en"));
+
+// Boxes: open/close
+document.querySelectorAll(".box .lid").forEach((lid) => {
+  lid.addEventListener("click", () => {
+    const box = lid.parentElement;
+    const open = box.classList.toggle("open");
+    lid.setAttribute("aria-expanded", open);
+  });
+});
+
+// Mosaic placeholders (until real photos are added to the HTML)
+const mosaic = document.getElementById("mosaic");
+if (mosaic && !mosaic.children.length) {
+  const colors = ["#ffd23f", "#ff5fa2", "#3a86ff", "#2ec4b6", "#ff7a1a", "#9b5de5"];
+  for (let i = 0; i < 32; i++) {
+    const d = document.createElement("div");
+    d.className = "pic";
+    d.style.background = colors[i % colors.length];
+    d.style.setProperty("--r", `${(Math.random() * 10 - 5).toFixed(1)}deg`);
+    mosaic.appendChild(d);
+  }
+}
