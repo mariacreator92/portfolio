@@ -1,45 +1,51 @@
-/* Warm, dimly lit gallery — palette taken from Leonor's references */
+/* A dim forest wall, gilded frames and small museum labels — after Leonor's own mock-ups */
 :root {
   color-scheme: dark;
-  --wall: #3b2b20;
-  --wall-dark: #18110c;
+  --wall-dark: #1d1812;
   --cream: #f3ead7;
   --muted: #b9a98f;
   --gold: #d6a64b;
-  --gold-grad: linear-gradient(135deg, #6e4a14, #d9a94a 18%, #f7df92 32%, #b07d2b 48%, #ecc96f 62%, #8a5f1c 80%, #d4a446);
   --burgundy: #7b2335;
   --paper: #f6efe0;
   --ink: #2a2420;
-  --spot: rgba(255, 205, 150, .16);
+  --serif: "Instrument Serif", "Times New Roman", serif;
+  --label: "Cormorant Garamond", Georgia, serif;
 }
 
 * { box-sizing: border-box; margin: 0; padding: 0; }
 [hidden] { display: none !important; }
+html, body { height: 100%; }
 body {
-  background: radial-gradient(ellipse 90% 70% at 50% 0%, #4a3627, var(--wall-dark) 80%) fixed, var(--wall-dark);
+  background: var(--wall-dark) url(img/wall.webp) center / cover no-repeat fixed;
   color: var(--cream);
-  font: 400 17px/1.6 "DM Sans", system-ui, sans-serif;
+  font: 400 17px/1.5 var(--label);
   -webkit-font-smoothing: antialiased;
-  min-height: 100vh;
-  overflow-x: hidden;
+  overflow: hidden;
 }
 a { color: inherit; text-decoration: none; }
-button { font: inherit; color: inherit; }
+button { font: inherit; color: inherit; background: none; border: 0; cursor: pointer; }
+svg { fill: none; stroke: currentColor; stroke-linecap: round; stroke-linejoin: round; }
 
-.nav, main, footer { max-width: 1200px; margin: 0 auto; padding: 0 20px; }
-.nav { display: flex; justify-content: space-between; align-items: center; padding-top: 18px; padding-bottom: 18px; position: relative; z-index: 5; }
-.logo { font-family: "Pinyon Script", cursive; font-size: 34px; color: var(--gold); }
-.lang { display: flex; border: 1px solid rgba(214,166,75,.7); border-radius: 999px; padding: 2px; margin-left: auto; background: rgba(24,17,12,.4); backdrop-filter: blur(4px); }
-.lang button {
-  font: 700 12px/1 "DM Sans", sans-serif; letter-spacing: .08em;
-  background: none; border: 0; color: var(--gold); padding: 6px 10px; border-radius: 999px; cursor: pointer;
+/* ---------- Top bar ---------- */
+.nav {
+  position: fixed; top: 0; left: 0; right: 0; z-index: 10;
+  display: flex; justify-content: space-between; align-items: center;
+  padding: 18px clamp(16px, 2.4vw, 40px); pointer-events: none;
 }
-.lang button[aria-pressed="true"] { background: var(--gold); color: var(--wall-dark); }
+.nav > * { pointer-events: auto; }
+.overview-link { font: italic 17px/1 var(--serif); color: var(--muted); letter-spacing: .02em; transition: color .3s; }
+.overview-link:hover { color: var(--cream); }
+body:not([data-view="exhibit"]) .overview-link { visibility: hidden; }
+body[data-view="splash"] .nav { display: none; }
+.lang { display: flex; gap: 2px; font: 13px/1 var(--serif); letter-spacing: .12em; }
+.lang button { padding: 6px 7px; color: var(--muted); opacity: .7; transition: opacity .3s, color .3s; }
+.lang button + button::before { content: "|"; margin-right: 9px; opacity: .5; }
+.lang button[aria-pressed="true"] { color: var(--cream); opacity: 1; }
+.lang button:hover { opacity: 1; }
 
-/* ---------- Screen 1: language ---------- */
-body[data-view="splash"] .nav, body[data-view="splash"] footer, body[data-view="entrance"] footer { display: none; }
+/* ---------- 1. Language ---------- */
 .splash { display: flex; height: 100svh; background: #000; }
-.half { position: relative; flex: 1; border: 0; cursor: pointer; overflow: hidden; background: none; display: grid; place-items: center; }
+.half { position: relative; flex: 1; overflow: hidden; display: grid; place-items: center; }
 .half::before {
   content: ""; position: absolute; inset: 0; background: center / cover no-repeat;
   transition: filter .8s ease, transform 1.6s ease;
@@ -48,158 +54,165 @@ body[data-view="splash"] .nav, body[data-view="splash"] footer, body[data-view="
 .half.pt::before { background-image: url(img/lang-pt.webp); }
 .half span {
   position: relative; font-family: "Pinyon Script", cursive; font-size: clamp(34px, 3.6vw, 58px);
-  color: var(--cream); transition: text-shadow .6s ease, letter-spacing .6s ease;
+  color: var(--cream); transition: text-shadow .6s ease;
 }
 .half:hover::before, .half:focus-visible::before { filter: brightness(1.45); transform: scale(1.03); }
 .half:hover span, .half:focus-visible span { text-shadow: 0 0 24px rgba(255,230,190,.45); }
 .half:focus-visible { outline: none; }
 
-/* ---------- Screen 2: the entrance ---------- */
-body[data-view="entrance"] .nav { position: absolute; left: 0; right: 0; max-width: none; }
-body[data-view="entrance"] .logo { display: none; }
-body[data-view="entrance"] main { display: none; }
-.entrance { position: relative; height: 100svh; overflow: hidden; background: #120d0a; }
-/* The stage keeps the photo's proportions and covers the screen, so text stays on the wall */
-.stage {
-  position: absolute; left: 50%; top: 0;
-  width: max(100vw, calc(100svh * 2400 / 1610)); aspect-ratio: 2400 / 1610;
-  transform: translateX(-50%); transform-origin: 50% 42%;
-  container-type: inline-size;
-  animation: settle 2.4s ease-out both;
+/* ---------- 2. Title wall ---------- */
+.intro { position: relative; height: 100svh; animation: fade 1.6s ease both; }
+.intro::before { content: ""; position: absolute; inset: 0; background: rgba(20,15,10,.35); }
+.intro-text { position: absolute; left: 25vw; right: 25vw; top: 29svh; }
+.sig {
+  font: 400 clamp(64px, 10.4vw, 200px)/1 "Pinyon Script", cursive; color: var(--cream);
+  text-shadow: 0 0 40px rgba(255,225,180,.18);
 }
-.stage > img { width: 100%; height: 100%; display: block; }
-@keyframes settle { from { transform: translateX(-50%) scale(1.06); opacity: 0; } to { transform: translateX(-50%) scale(1); opacity: 1; } }
-.stage.walk { animation: walk .9s ease-in forwards; }
-@keyframes walk { to { transform: translateX(-50%) scale(1.9); opacity: 0; } }
-
-.wall-title { position: absolute; left: 35%; right: 36%; top: 23.4%; color: #f6ecdc; }
-.sig { font-family: "Pinyon Script", cursive; font-size: 5cqw; line-height: 1; text-shadow: 0 0 2cqw rgba(255,220,170,.25); }
-.wall-title blockquote {
-  font-family: "Bodoni Moda", serif; font-size: max(1cqw, 11px); line-height: 1.32;
-  text-align: right; max-width: 27cqw; margin: .9cqw 0 0 auto; letter-spacing: 0;
+.intro blockquote {
+  font: 400 clamp(19px, 1.9vw, 38px)/1.25 var(--serif);
+  text-align: right; max-width: 46vw; margin: 1svh 0 0 auto;
 }
-.cite { font-family: "Bodoni Moda", serif; font-size: max(.8cqw, 9px); text-align: right; margin-top: .4cqw; opacity: .85; }
+.intro .cite { font: 400 clamp(14px, 1.3vw, 26px)/1 var(--serif); text-align: right; margin-top: 1.4svh; opacity: .9; }
 
-.choices { position: absolute; left: 50%; top: 44.5%; transform: translateX(-50%); display: flex; align-items: center; gap: 2.2cqw; white-space: nowrap; }
-.choices button {
-  background: none; border: 0; cursor: pointer; color: #f6ecdc;
-  display: flex; flex-direction: column; align-items: center; gap: .25cqw; padding: .4cqw .6cqw;
+.arrow { position: absolute; z-index: 4; color: var(--cream); opacity: .85; padding: 10px; transition: opacity .3s, transform .3s; }
+.arrow svg { width: 22px; height: 44px; stroke-width: 1.4; display: block; }
+.arrow:hover { opacity: 1; }
+.intro .next-arrow { right: 5.5vw; bottom: 9svh; }
+.intro .next-arrow:hover { transform: translateX(4px); }
+
+@keyframes fade { from { opacity: 0; } to { opacity: 1; } }
+
+/* ---------- 3. The whole collection ---------- */
+.overview { height: 100svh; display: grid; place-items: center; animation: fade 1s ease both; }
+/* The composition keeps its 16:9 proportions and fits the screen */
+.composition { position: relative; width: min(100vw, calc(100svh * 16 / 9)); aspect-ratio: 16 / 9; }
+.piece { position: absolute; display: block; transition: transform .5s ease, filter .5s ease; }
+.piece img { width: 100%; height: auto; display: block; filter: drop-shadow(0 12px 18px rgba(0,0,0,.55)); }
+.piece:hover, .piece:focus-visible { transform: scale(1.035); filter: brightness(1.12); z-index: 1; outline: none; }
+
+/* ---------- 4. The exhibition ---------- */
+.exhibit { position: relative; height: 100svh; animation: fade .8s ease both; }
+.strip {
+  display: flex; height: 100%; overflow-x: auto; overflow-y: hidden;
+  scroll-snap-type: x mandatory; scrollbar-width: none;
+  padding-left: 7.5vw; padding-right: 19vw; scroll-padding-left: 7.5vw;
+  cursor: grab; overscroll-behavior-x: contain;
 }
-.choices .big { font-family: "Bodoni Moda", serif; font-style: italic; font-size: max(1.6cqw, 16px); transition: color .3s ease, text-shadow .3s ease; }
-.choices .small { font-family: "Bodoni Moda", serif; font-size: max(.7cqw, 9px); letter-spacing: .22em; text-transform: uppercase; opacity: .7; }
-.choices button:hover .big, .choices button:focus-visible .big { color: var(--gold); text-shadow: 0 0 18px rgba(214,166,75,.45); }
-.choices button:focus-visible { outline: none; }
-.sep { width: 1px; height: max(2.6cqw, 28px); background: rgba(246,236,220,.4); }
+.strip::-webkit-scrollbar { display: none; }
+.strip.dragging { cursor: grabbing; scroll-snap-type: none; user-select: none; }
+.strip.dragging img { pointer-events: none; }
 
-/* ---------- Gallery wall (free visit) ---------- */
-.gallery { padding: 8px 0 48px; }
-.title-row { display: flex; justify-content: space-between; align-items: flex-end; flex-wrap: wrap; gap: 16px 24px; }
-h1 {
-  font-family: "Pinyon Script", cursive; font-weight: 400;
-  font-size: clamp(80px, 13vw, 160px); line-height: .9; color: var(--cream);
-  text-shadow: 0 0 40px rgba(255,220,170,.18);
+/* Each bay: the painting, then its label; the next painting peeks in from the right */
+.bay {
+  flex: 0 0 81vw; height: 100%; scroll-snap-align: start;
+  display: flex; align-items: center; gap: 2.4vw;
+}
+.frame {
+  height: calc(var(--s) * 1svh); width: auto; max-width: 52vw; object-fit: contain; flex: none;
+  filter: drop-shadow(0 18px 28px rgba(0,0,0,.6)); user-select: none; -webkit-user-drag: none;
 }
 .label {
-  display: grid; grid-template-columns: auto auto; gap: 4px 24px; margin-bottom: 18px;
-  font-family: "Bodoni Moda", serif; letter-spacing: .14em;
-  text-transform: uppercase; color: var(--gold); font-size: 13px;
+  width: clamp(170px, 9.4vw, 230px); align-self: flex-end; margin-bottom: 21svh;
+  font: 400 clamp(9px, .56vw, 12px)/1.32 var(--label); color: #e9dfcb; cursor: zoom-in;
+  display: flex; flex-direction: column; gap: 1.4em;
 }
-.label dd { color: var(--cream); }
-.hint { font-family: "Bodoni Moda", serif; font-style: italic; color: var(--muted); font-size: 17px; margin: 4px 0 40px; }
+.l-block { display: block; }
+.l-head { display: block; font-weight: 500; margin-bottom: .9em; }
+.l-head b { font-weight: 700; }
+.l-text { display: block; text-align: justify; hyphens: auto; opacity: .92; }
+.l-block.alt { font-style: italic; }
+.label .write { align-self: flex-start; font: italic 700 1.1em/1 var(--label); color: var(--gold); margin-top: -.4em; }
+.label .write:hover { color: var(--cream); }
+.phones { align-self: flex-end; color: var(--cream); opacity: .85; margin-top: -.6em; padding: 4px; transition: opacity .3s, transform .3s; }
+.phones svg { width: 16px; height: 16px; stroke-width: 1.6; display: block; }
+.phones:hover, .label:hover .phones { opacity: 1; transform: scale(1.15); }
 
-.wall { display: flex; flex-wrap: wrap; justify-content: center; align-items: center; gap: 48px 40px; }
-.row-break { flex-basis: 100%; height: 0; }
-.art { display: flex; flex-direction: column; align-items: center; gap: 14px; transition: transform .35s ease; }
-.art img { height: var(--h); width: auto; display: block; filter: drop-shadow(0 18px 22px rgba(0,0,0,.6)); transition: filter .35s ease; }
-.art:hover { transform: translateY(-8px); }
-.art:hover img { filter: drop-shadow(0 26px 30px rgba(0,0,0,.65)) drop-shadow(0 0 22px rgba(255,205,150,.3)); }
-.plaque {
-  font-family: "Cormorant Garamond", serif; font-size: 15px; font-weight: 700; letter-spacing: .05em;
-  color: var(--wall-dark); background: var(--gold-grad);
-  padding: 3px 12px; border-radius: 2px; box-shadow: 0 3px 6px rgba(0,0,0,.4); white-space: nowrap;
+.exhibit .arrow { bottom: 6svh; }
+.exhibit .next-arrow { right: 3.5vw; }
+.exhibit .prev-arrow { right: calc(3.5vw + 130px); }
+.exhibit .next-arrow:hover { transform: translateX(4px); }
+.exhibit .prev-arrow:hover { transform: translateX(-4px); }
+.counter {
+  position: absolute; bottom: calc(6svh + 22px); right: calc(3.5vw + 44px); width: 86px; text-align: center;
+  font: 15px/1 var(--serif); letter-spacing: .14em; color: var(--muted);
 }
 
-/* ---------- Room ---------- */
-.room { padding: 8px 0; }
-.room.enter { animation: enter .6s ease; }
-@keyframes enter { from { opacity: 0; } to { opacity: 1; } }
-.room-label { font-family: "Bodoni Moda", serif; letter-spacing: .2em; text-transform: uppercase; color: var(--gold); font-size: 12px; }
-.room-main {
-  display: flex; justify-content: center; align-items: flex-end; gap: 56px;
-  padding: 40px 0 24px;
+/* ---------- Corner desk ---------- */
+.desk {
+  position: fixed; left: clamp(16px, 2.4vw, 40px); bottom: 5svh; z-index: 6;
+  display: flex; flex-direction: column; gap: 10px; align-items: flex-start;
 }
-/* Spotlight from the ceiling onto the painting */
-body[data-view="room"] {
-  background: radial-gradient(ellipse 38% 75% at 60% 0%, var(--spot), transparent 75%) fixed,
-    radial-gradient(ellipse 90% 70% at 50% 0%, #4a3627, var(--wall-dark) 80%) fixed, var(--wall-dark);
-}
-.painting img {
-  display: block; height: min(70vh, 660px); width: auto; max-width: min(60vw, 780px); object-fit: contain;
-  filter: drop-shadow(0 30px 40px rgba(0,0,0,.6));
-}
-/* Small wall label beside the painting, like in a museum */
-.note {
-  width: 210px; margin-bottom: 4%; flex-shrink: 0;
-  background: none; border: 0; cursor: zoom-in; text-align: left;
-  display: flex; flex-direction: column; gap: 4px;
-  font-family: "Cormorant Garamond", serif; color: var(--cream); opacity: .82;
-  transition: opacity .3s ease, transform .3s ease;
-}
-.note:hover, .note:focus-visible { opacity: 1; transform: scale(1.03); outline: none; }
-.note-title { font-weight: 700; font-size: 13px; }
-.note-medium { font-style: italic; font-size: 12px; color: var(--gold); }
-.note-text { font-size: 11px; line-height: 1.45; text-align: justify; hyphens: auto; }
-.note-hint { font-family: "Bodoni Moda", serif; font-size: 9px; letter-spacing: .2em; text-transform: uppercase; color: var(--gold); margin-top: 6px; }
+body[data-view="splash"] .desk, body[data-view="intro"] .desk { display: none; }
+.desk button { display: flex; align-items: center; gap: 9px; font: italic 15px/1 var(--serif); color: var(--muted); transition: color .3s; }
+.desk button:hover { color: var(--cream); }
+.desk svg { width: 18px; height: 18px; stroke-width: 1.3; }
 
-.reader {
-  position: fixed; inset: 0; z-index: 20; display: grid; place-items: center; padding: 20px;
-  background: rgba(12,8,5,.85); backdrop-filter: blur(6px);
+/* ---------- Pop-up panel ---------- */
+.panel {
+  position: fixed; inset: 0; z-index: 20; display: grid; place-items: center; padding: 16px;
+  background: rgba(12,9,6,.82); backdrop-filter: blur(6px);
 }
-.reader-card {
-  position: relative; max-width: 640px; max-height: 90svh; overflow: auto; padding: 48px 44px;
-  background: var(--wall); border: 1px solid rgba(214,166,75,.5); box-shadow: 0 30px 60px rgba(0,0,0,.6);
-  font-family: "Cormorant Garamond", serif;
+.panel-card {
+  position: relative; width: min(680px, 100%); max-height: 90svh; overflow: auto; padding: 52px 48px 44px;
+  background: rgba(36,29,21,.96); border: 1px solid rgba(214,166,75,.35); box-shadow: 0 30px 60px rgba(0,0,0,.6);
 }
-.reader-card h2 { font-weight: 700; font-size: 38px; line-height: 1.1; }
-.reader-card .medium { font-style: italic; font-size: 21px; color: var(--gold); margin: 6px 0 20px; }
-.reader-card .text { font-size: 21px; line-height: 1.55; text-align: justify; hyphens: auto; }
-.reader-close { position: absolute; top: 10px; right: 16px; background: none; border: 0; font-size: 32px; color: var(--gold); cursor: pointer; }
+.panel-close { position: absolute; top: 8px; right: 16px; font-size: 32px; line-height: 1; color: var(--gold); }
+.guide-block h2 { font: 700 34px/1.1 var(--label); }
+.guide-block .medium { font: italic 20px/1.3 var(--label); color: var(--gold); margin: 6px 0 16px; }
+.guide-block .text, .panel .text { font-size: 20px; line-height: 1.55; text-align: justify; hyphens: auto; }
+.guide-block.alt { margin-top: 34px; padding-top: 28px; border-top: 1px solid rgba(214,166,75,.25); font-style: italic; }
+.guide-block.alt h2 { font-size: 26px; }
+.audio { display: flex; gap: 14px; align-items: center; margin-top: 34px; padding: 16px 18px; border: 1px dashed rgba(214,166,75,.45); color: var(--muted); font-style: italic; font-size: 17px; }
+.audio svg { width: 26px; height: 26px; flex: none; stroke-width: 1.4; color: var(--gold); }
+.panel .sig { font-size: 72px; margin-bottom: 18px; }
 
-.room-nav {
-  display: flex; justify-content: space-between; align-items: center; gap: 16px; flex-wrap: wrap;
-  border-top: 1px solid rgba(214,166,75,.35); margin-top: 64px; padding: 24px 0;
-  font-family: "Cormorant Garamond", serif; font-size: 20px; font-weight: 700; color: var(--gold);
+/* The letter */
+.letter { background: var(--paper); color: var(--ink); padding: 34px 34px 28px; display: grid; gap: 14px; box-shadow: 0 10px 30px rgba(0,0,0,.35); }
+.salutation { font: 400 34px/1 "Pinyon Script", cursive; }
+.letter label { display: grid; gap: 4px; font: italic 15px/1.2 var(--label); color: #6b5d50; }
+.letter input, .letter textarea {
+  font: 18px/1.4 var(--label); color: var(--ink); background: transparent;
+  border: 0; border-bottom: 1px solid rgba(42,36,32,.35); padding: 4px 0; outline: none; resize: vertical;
 }
-.room-nav a:hover { color: var(--cream); }
-.room-nav .back { font-style: italic; color: var(--muted); }
+.letter input:focus, .letter textarea:focus { border-color: var(--burgundy); }
+.hp { position: absolute; left: -9999px; }
+.seal-row { display: flex; align-items: center; gap: 16px; margin-top: 6px; flex-wrap: wrap; }
+.seal {
+  width: 92px; height: 92px; border-radius: 50%; flex: none;
+  background: radial-gradient(circle at 35% 30%, #a8364c, var(--burgundy) 60%, #4d1220);
+  color: #f3d9c9; font: italic 700 14px/1.1 var(--label); padding: 10px; box-shadow: 0 4px 10px rgba(0,0,0,.3);
+  transition: transform .3s;
+}
+.seal:hover { transform: rotate(-6deg) scale(1.05); }
+.status { font: italic 16px/1.3 var(--label); color: #6b5d50; flex: 1; min-width: 160px; }
 
-footer { padding-top: 24px; padding-bottom: 40px; color: var(--muted); font-size: 13px; font-family: "Bodoni Moda", serif; letter-spacing: .1em; }
-
+/* ---------- Phones ---------- */
 @media (max-width: 860px) {
   .splash { flex-direction: column; }
-  .wall-title { left: 37%; }
-  .wall { display: grid; grid-template-columns: 1fr 1fr; gap: 36px 16px; align-items: end; }
-  .row-break { display: none; }
-  .art img { height: calc(var(--h) * .58); max-width: 100%; object-fit: contain; }
-  .plaque { font-size: 13px; white-space: normal; text-align: center; }
-  .room-main { flex-direction: column; align-items: center; gap: 28px; padding-top: 28px; }
-  .painting { order: -1; }
-  .painting img { height: auto; max-height: 60svh; max-width: 100%; }
-  .note { width: 100%; max-width: 520px; cursor: default; opacity: 1; margin: 0; }
-  .note:hover { transform: none; }
-  .note-title { font-size: 24px; }
-  .note-medium { font-size: 18px; }
-  .note-text { font-size: 18px; line-height: 1.55; text-align: left; }
-  .note-hint { display: none; }
-  .extra { margin-top: 48px; }
-  .letter { padding: 28px 22px; }
-  .catalogue { font-size: 18px; }
-  .catalogue li { flex-wrap: wrap; }
-  .catalogue .dots { display: none; }
-  .catalogue li > span:last-child { width: 100%; text-align: left; }
-  .room-nav { font-size: 17px; }
-  .room-nav .back { order: -1; width: 100%; text-align: center; }
+  .intro-text { left: 8vw; right: 8vw; top: 26svh; }
+  .sig { font-size: clamp(64px, 20vw, 110px); }
+  .intro blockquote { max-width: none; font-size: 21px; }
+  .intro .cite { font-size: 16px; }
+
+  /* The composition is wider than the phone: walk along it sideways */
+  .overview { display: block; overflow-x: auto; overflow-y: hidden; }
+  .composition { width: calc(72svh * 16 / 9); margin-top: 14svh; }
+
+  .strip { padding: 0; scroll-padding-left: 0; }
+  .bay { flex-basis: 100vw; flex-direction: column; justify-content: flex-start; gap: 18px; padding: 70px 8vw 120px; overflow-y: auto; scroll-snap-align: start; }
+  .frame { height: auto; max-height: 46svh; max-width: 84vw; }
+  .label { width: 100%; max-width: 460px; margin: 0; font-size: 15px; line-height: 1.45; cursor: default; }
+  .l-block.alt { display: none; }
+  .phones svg { width: 22px; height: 22px; }
+  .exhibit .arrow { bottom: 3svh; }
+  .counter { bottom: calc(3svh + 22px); }
+  .desk { bottom: 3svh; gap: 8px; }
+  .desk span { display: none; }
+  .desk svg { width: 22px; height: 22px; }
+  .panel-card { padding: 46px 22px 28px; }
+  .guide-block .text, .panel .text { font-size: 18px; text-align: left; }
+  .letter { padding: 26px 20px; }
 }
 @media (prefers-reduced-motion: reduce) {
-  * { transition: none !important; animation: none !important; }
+  * { transition: none !important; animation: none !important; scroll-behavior: auto !important; }
 }

@@ -76,28 +76,16 @@ const works = [
 
 const ui = {
   en: {
-    "g.exhibit": "Exhibition:", "g.exhibitVal": "Portfolio", "g.works": "Works:",
-    "g.hint": "Click a painting to step inside.",
-    "room.label": "Room", "room.back": "Back to the gallery",
+    "nav.overview": "← The whole collection",
     "e.quote": "It is a truth universally acknowledged, that a young professional in possession of a portfolio must be in want of someone to see it.",
     "e.cite": "— The curators",
-    "e.guided": "Guided tour", "e.guidedSub": "The eight works, in order",
-    "e.free": "Wander freely", "e.freeSub": "At your own pace",
-    "room.read": "Click to read",
-    "tour.of": "of", "tour.work": "Work", "tour.next": "Next work →", "tour.end": "End the tour →", "tour.exit": "Leave the guided tour",
-    "inv.title": "Catalogue of objects",
-    "inv.o1": "Passport", "inv.s1": "Languages · Portuguese & English",
-    "inv.o2": "Notebook & pen", "inv.s2": "Organisation & planning",
-    "inv.o3": "Colour swatches", "inv.s3": "Visual sense & design",
-    "inv.o4": "Phone", "inv.s4": "Social media & content",
-    "inv.o5": "Earphones", "inv.s5": "Listening & communication",
-    "inv.o6": "Watch", "inv.s6": "Time management",
-    "craft.title": "Open a drawer",
-    "lib.title": "Take a book from the shelf",
-    "lib.edu": "Education", "lib.work": "Experience",
-    "lib.placeholder": "Role · years — a line or two about what you did here.",
-    "lib.cv": "Full résumé (PDF)",
-    "mail.title": "Write her a letter",
+    "e.enter": "Enter the exhibition",
+    "desk.flyer": "The exhibition", "desk.contact": "Write to Leonor",
+    "flyer.soon": "The exhibition flyer is still at the printer's. Do come back soon.",
+    "guide.open": "Audio guide and more about this work",
+    "guide.soon": "The audio guide is being recorded. More about this work very soon.",
+    "label.write": "Write her a letter →",
+    "prev": "Previous work", "next": "Next work", "end": "Back to the whole collection", "close": "Close",
     "mail.dear": "Dear Leonor,", "mail.name": "Your name", "mail.email": "Your email", "mail.msg": "Your message",
     "mail.send": "Seal & send", "mail.sending": "Sending…",
     "mail.ok": "Your letter is on its way. Thank you!",
@@ -105,28 +93,16 @@ const ui = {
     "mail.off": "The post office isn't open yet — this form will work soon.",
   },
   pt: {
-    "g.exhibit": "Exposição:", "g.exhibitVal": "Portfólio", "g.works": "Obras:",
-    "g.hint": "Clica num quadro para entrar.",
-    "room.label": "Sala", "room.back": "Voltar à galeria",
+    "nav.overview": "← A coleção completa",
     "e.quote": "É uma verdade universalmente reconhecida que uma jovem profissional, na posse de um portfólio, há de andar à procura de quem o queira ver.",
     "e.cite": "— A curadoria",
-    "e.guided": "Visita guiada", "e.guidedSub": "As oito obras, por ordem",
-    "e.free": "Visita livre", "e.freeSub": "Ao teu ritmo",
-    "room.read": "Clica para ler",
-    "tour.of": "de", "tour.work": "Obra", "tour.next": "Próxima obra →", "tour.end": "Terminar a visita →", "tour.exit": "Sair da visita guiada",
-    "inv.title": "Catálogo de objetos",
-    "inv.o1": "Passaporte", "inv.s1": "Línguas · Português e Inglês",
-    "inv.o2": "Caderno e caneta", "inv.s2": "Organização e planeamento",
-    "inv.o3": "Amostras de cor", "inv.s3": "Sentido estético e design",
-    "inv.o4": "Telemóvel", "inv.s4": "Redes sociais e conteúdo",
-    "inv.o5": "Auriculares", "inv.s5": "Saber ouvir e comunicar",
-    "inv.o6": "Relógio", "inv.s6": "Gestão de tempo",
-    "craft.title": "Abre uma gaveta",
-    "lib.title": "Tira um livro da estante",
-    "lib.edu": "Formação", "lib.work": "Experiência",
-    "lib.placeholder": "Cargo · anos — uma ou duas linhas sobre o que fizeste aqui.",
-    "lib.cv": "Currículo completo (PDF)",
-    "mail.title": "Escreve-lhe uma carta",
+    "e.enter": "Entrar na exposição",
+    "desk.flyer": "A exposição", "desk.contact": "Escrever à Leonor",
+    "flyer.soon": "O folheto da exposição ainda está na gráfica. Volta em breve.",
+    "guide.open": "Audioguia e mais sobre esta obra",
+    "guide.soon": "O audioguia está a ser gravado. Em breve, mais sobre esta obra.",
+    "label.write": "Escreve-lhe uma carta →",
+    "prev": "Obra anterior", "next": "Próxima obra", "end": "Voltar à coleção completa", "close": "Fechar",
     "mail.dear": "Querida Leonor,", "mail.name": "O teu nome", "mail.email": "O teu email", "mail.msg": "A tua mensagem",
     "mail.send": "Selar e enviar", "mail.sending": "A enviar…",
     "mail.ok": "A tua carta já vai a caminho. Obrigada!",
@@ -137,8 +113,11 @@ const ui = {
 
 const roman = ["I", "II", "III", "IV", "V", "VI", "VII", "VIII"];
 const pad = (n) => String(n).padStart(2, "0");
+const $ = (id) => document.getElementById(id);
+const reduced = matchMedia("(prefers-reduced-motion: reduce)").matches;
 let lang = "en";
 const t = (key) => ui[lang][key] || key;
+const other = () => (lang === "en" ? "pt" : "en");
 
 // ---------- Language ----------
 function translate(root = document) {
@@ -146,6 +125,9 @@ function translate(root = document) {
     const text = ui[lang][el.dataset.i18n];
     if (text) el.textContent = text;
   });
+  $("enter").setAttribute("aria-label", t("e.enter"));
+  $("prev").setAttribute("aria-label", t("prev"));
+  $("panel-close").setAttribute("aria-label", t("close"));
 }
 
 function setLang(next) {
@@ -154,145 +136,208 @@ function setLang(next) {
   document.querySelectorAll("[data-lang]").forEach((b) => b.setAttribute("aria-pressed", b.dataset.lang === lang));
   try { localStorage.setItem("lang", lang); } catch {}
   translate();
-  buildWall();
-  render(false);
+  buildComposition();
+  buildStrip();
+  render();
 }
-
 document.querySelectorAll("[data-lang]").forEach((b) => b.addEventListener("click", () => setLang(b.dataset.lang)));
 
-// ---------- Gallery wall ----------
-// Height of each painting on the wall (px, desktop) — a salon-style hang in two rows
-const hang = { 1: 230, 2: 290, 3: 250, 4: 330, 5: 210, 6: 260, 7: 270, 8: 200 };
+// ---------- The whole collection, hung as in Leonor's composition (px on a 1920×1080 wall) ----------
+const hang = {
+  1: { x: 305, y: 155, w: 455 },
+  2: { x: 815, y: 90, w: 335 },
+  8: { x: 1203, y: 148, w: 224 },
+  3: { x: 1452, y: 145, w: 210 },
+  6: { x: 137, y: 590, w: 213 },
+  4: { x: 390, y: 605, w: 300 },
+  5: { x: 725, y: 635, w: 457 },
+  7: { x: 1215, y: 483, w: 547 },
+};
 
-function buildWall() {
-  document.getElementById("wall").innerHTML = works.map((w) => `
-    ${w.n === 5 ? '<span class="row-break"></span>' : ""}
-    <a href="#${w.slug}" class="art" style="--h:${hang[w.n]}px">
-      <img src="img/${pad(w.n)}-frame.webp" alt="${w.title[lang]}" loading="${w.n <= 4 ? "eager" : "lazy"}">
-      <span class="plaque"><b>${roman[w.n - 1]}.</b> ${w.title[lang]}</span>
-    </a>`).join("");
+function buildComposition() {
+  $("composition").innerHTML = works.map((w) => {
+    const h = hang[w.n];
+    return `<a href="#${w.slug}" class="piece" style="left:${h.x / 19.2}%;top:${h.y / 10.8}%;width:${h.w / 19.2}%">
+      <img src="img/${pad(w.n)}-thumb.webp" alt="${w.title[lang]}">
+    </a>`;
+  }).join("");
 }
 
-// ---------- Rooms ----------
-const $ = (id) => document.getElementById(id);
+// ---------- The exhibition wall ----------
+// How tall each painting hangs in the exhibition (% of screen height)
+const size = { 1: 70, 2: 88, 3: 76, 4: 74, 5: 64, 6: 76, 7: 60, 8: 76 };
 
-// Guided tour lives in sessionStorage so a reload keeps you in it
-const store = {
-  get: (k) => { try { return sessionStorage.getItem(k); } catch { return null; } },
-  set: (k, v) => { try { v == null ? sessionStorage.removeItem(k) : sessionStorage.setItem(k, v); } catch {} },
-};
-const touring = () => store.get("tour") === "1";
+const labelBlock = (w, l, cls = "") => `
+  <span class="l-block ${cls}" lang="${l}">
+    <span class="l-head"><b>${w.title[l]}.</b> ${w.medium[l]}<br>${w.year}</span>
+    <span class="l-text">${w.text[l]}</span>
+  </span>`;
 
-function render(scroll = true) {
+function buildStrip() {
+  $("strip").innerHTML = works.map((w) => `
+    <section class="bay" data-slug="${w.slug}" aria-label="${roman[w.n - 1]}. ${w.title[lang]}">
+      <img class="frame" src="img/${pad(w.n)}-frame.webp" alt="${w.title[lang]}" style="--s:${size[w.n]}" loading="${w.n <= 2 ? "eager" : "lazy"}">
+      <div class="label" data-guide="${w.slug}">
+        ${labelBlock(w, lang)}
+        ${labelBlock(w, other(), "alt")}
+        ${w.slug === "correspondence" ? `<button type="button" class="write" data-open="contact">${t("label.write")}</button>` : ""}
+        <button type="button" class="phones" data-guide="${w.slug}" aria-label="${t("guide.open")}" title="${t("guide.open")}">
+          <svg viewBox="0 0 24 24" aria-hidden="true"><path d="M4 15v-3a8 8 0 0116 0v3 M4 15h3v5H4z M17 15h3v5h-3z"/></svg>
+        </button>
+      </div>
+    </section>`).join("");
+  wirePanelOpeners($("strip"));
+}
+
+const strip = $("strip");
+const bays = () => [...strip.children];
+let current = 0;
+
+function bayLeft(i) {
+  return i * bays()[0].offsetWidth;
+}
+function goTo(i, smooth = true) {
+  if (i < 0) return;
+  if (i >= works.length) { location.hash = "gallery"; return; }
+  strip.scrollTo({ left: bayLeft(i), behavior: smooth && !reduced ? "smooth" : "instant" });
+  setCurrent(i);
+}
+function setCurrent(i) {
+  current = i;
+  const w = works[i];
+  $("counter").textContent = `${roman[i]} / ${roman[works.length - 1]}`;
+  $("prev").hidden = i === 0;
+  $("next").setAttribute("aria-label", t(i === works.length - 1 ? "end" : "next"));
+  if (location.hash.slice(1) !== w.slug) history.replaceState(null, "", "#" + w.slug);
+}
+// Keep the address and counter in step with free scrolling and swiping
+let scrollTimer;
+strip.addEventListener("scroll", () => {
+  clearTimeout(scrollTimer);
+  scrollTimer = setTimeout(() => {
+    const i = Math.round(strip.scrollLeft / bays()[0].offsetWidth);
+    if (i !== current) setCurrent(Math.min(i, works.length - 1));
+  }, 80);
+});
+
+$("prev").addEventListener("click", () => goTo(current - 1));
+$("next").addEventListener("click", () => goTo(current + 1));
+
+// A vertical mouse wheel walks along the wall, one painting per gesture
+let wheelLock = 0;
+strip.addEventListener("wheel", (e) => {
+  if (Math.abs(e.deltaY) <= Math.abs(e.deltaX)) return;
+  e.preventDefault();
+  if (Date.now() < wheelLock || Math.abs(e.deltaY) < 4) return;
+  wheelLock = Date.now() + 650;
+  goTo(current + (e.deltaY > 0 ? 1 : -1));
+}, { passive: false });
+
+// Drag with the mouse (touch screens swipe natively)
+let drag = null;
+strip.addEventListener("pointerdown", (e) => {
+  if (e.pointerType !== "mouse" || e.button !== 0 || e.target.closest("button")) return;
+  drag = { x: e.clientX, left: strip.scrollLeft, moved: false };
+});
+window.addEventListener("pointermove", (e) => {
+  if (!drag) return;
+  const dx = e.clientX - drag.x;
+  if (!drag.moved && Math.abs(dx) > 6) { drag.moved = true; strip.classList.add("dragging"); }
+  if (drag.moved) strip.scrollLeft = drag.left - dx;
+});
+window.addEventListener("pointerup", (e) => {
+  if (!drag) return;
+  const { moved, x } = drag;
+  drag = null;
+  strip.classList.remove("dragging");
+  if (!moved) return;
+  const dx = e.clientX - x;
+  goTo(Math.abs(dx) > 60 ? current + (dx < 0 ? 1 : -1) : current);
+  // swallow the click that ends a drag
+  strip.addEventListener("click", (ev) => { ev.stopPropagation(); ev.preventDefault(); }, { capture: true, once: true });
+});
+
+// ---------- Panels: audio guide, flyer, contact ----------
+function openPanel(kind, slug) {
+  document.querySelectorAll(".panel-body").forEach((b) => (b.hidden = b.dataset.panel !== kind));
+  if (kind === "guide") {
+    const w = works.find((x) => x.slug === slug);
+    $("guide-labels").innerHTML = [lang, other()].map((l, k) => `
+      <div class="guide-block ${k ? "alt" : ""}" lang="${l}">
+        <h2>${w.title[l]}.</h2>
+        <p class="medium">${w.medium[l]}, ${w.year}</p>
+        <p class="text">${w.text[l]}</p>
+      </div>`).join("");
+  }
+  $("panel-card").setAttribute("aria-label", kind === "guide" ? works.find((x) => x.slug === slug).title[lang] : t(kind === "flyer" ? "desk.flyer" : "desk.contact"));
+  $("panel").hidden = false;
+  $("panel-card").scrollTop = 0;
+  $("panel-close").focus();
+}
+function closePanel() { $("panel").hidden = true; }
+
+function wirePanelOpeners(root) {
+  root.querySelectorAll("[data-open]").forEach((b) => b.addEventListener("click", (e) => { e.stopPropagation(); openPanel(b.dataset.open); }));
+  root.querySelectorAll("[data-guide]").forEach((b) => b.addEventListener("click", (e) => { e.stopPropagation(); openPanel("guide", b.dataset.guide); }));
+}
+wirePanelOpeners($("desk"));
+$("panel-close").addEventListener("click", closePanel);
+$("panel").addEventListener("click", (e) => { if (e.target === $("panel")) closePanel(); });
+
+document.addEventListener("keydown", (e) => {
+  if (e.key === "Escape") return closePanel();
+  if (!$("panel").hidden) return;
+  const view = document.body.dataset.view;
+  if (view === "exhibit" && e.key === "ArrowRight") { e.preventDefault(); goTo(current + 1); }
+  if (view === "exhibit" && e.key === "ArrowLeft") { e.preventDefault(); goTo(current - 1); }
+  if (view === "intro" && (e.key === "ArrowRight" || e.key === "Enter")) location.hash = "gallery";
+});
+
+// Letter (Web3Forms)
+const form = $("letter");
+form.addEventListener("submit", async (e) => {
+  e.preventDefault();
+  const status = $("letter-status");
+  if (form.access_key.value.startsWith("YOUR_")) { status.textContent = t("mail.off"); return; }
+  status.textContent = t("mail.sending");
+  try {
+    const res = await fetch("https://api.web3forms.com/submit", { method: "POST", body: new FormData(form) });
+    const data = await res.json();
+    if (!data.success) throw new Error(data.message);
+    form.reset();
+    status.textContent = t("mail.ok");
+  } catch {
+    status.textContent = t("mail.err");
+  }
+});
+
+// ---------- Views ----------
+function render() {
   const hash = location.hash.slice(1);
-  const w = works.find((x) => x.slug === hash);
-  const view = w ? "room" : hash === "gallery" ? "gallery" : hash === "entrance" ? "entrance" : "splash";
-  if (view === "gallery") store.set("tour", null);
+  const i = works.findIndex((x) => x.slug === hash);
+  const view = i >= 0 ? "exhibit" : hash === "gallery" ? "gallery" : hash === "intro" || hash === "entrance" ? "intro" : "splash";
+  const was = document.body.dataset.view;
   document.body.dataset.view = view;
   $("splash").hidden = view !== "splash";
-  $("entrance").hidden = view !== "entrance";
+  $("intro").hidden = view !== "intro";
   $("gallery").hidden = view !== "gallery";
-  $("room").hidden = view !== "room";
-  if (view === "entrance") $("stage").classList.remove("walk");
-  closeReader();
-  if (scroll) window.scrollTo({ top: 0, behavior: "instant" });
-  if (!w) return;
-
-  const i = works.indexOf(w);
-  const prev = works[(i + works.length - 1) % works.length];
-  const next = works[(i + 1) % works.length];
-  const tour = touring();
-
-  $("room-img").src = `img/${pad(w.n)}-frame.webp`;
-  $("room-img").alt = w.title[lang];
-  $("room-num").textContent = tour ? `${roman[w.n - 1]} · ${t("tour.work")} ${w.n} ${t("tour.of")} ${works.length}` : roman[w.n - 1];
-  $("note-title").textContent = $("reader-title").textContent = w.title[lang] + ".";
-  $("note-medium").textContent = $("reader-medium").textContent = `${w.medium[lang]}, ${w.year}`;
-  $("note-text").textContent = $("reader-text").textContent = w.text[lang];
-
-  const last = i === works.length - 1;
-  $("prev").hidden = tour && i === 0;
-  $("prev").href = "#" + prev.slug;
-  $("prev").textContent = "← " + prev.title[lang];
-  $("back").textContent = t(tour ? "tour.exit" : "room.back");
-  $("next").href = tour && last ? "#gallery" : "#" + next.slug;
-  $("next").textContent = tour ? t(last ? "tour.end" : "tour.next") : next.title[lang] + " →";
-  $("next").classList.toggle("gold-btn", tour);
-
-  const extra = $("room-extra");
-  const tpl = document.getElementById("extra-" + w.slug);
-  if (extra.dataset.slug !== w.slug) {
-    extra.innerHTML = "";
-    extra.dataset.slug = w.slug;
-    if (tpl) { extra.appendChild(tpl.content.cloneNode(true)); wireExtras(extra); }
+  $("exhibit").hidden = view !== "exhibit";
+  closePanel();
+  // On phones the composition is wider than the screen: start in the middle of the wall
+  if (view === "gallery") { const g = $("gallery"); g.scrollLeft = (g.scrollWidth - g.clientWidth) / 2; }
+  if (view === "exhibit") {
+    // Arriving from elsewhere: stand straight in front of the chosen painting
+    if (was !== "exhibit" || i !== current) goTo(i, was === "exhibit");
+    else setCurrent(i);
   }
-  translate(extra);
-  if (scroll) { $("room").classList.remove("enter"); void $("room").offsetWidth; $("room").classList.add("enter"); }
 }
-window.addEventListener("hashchange", () => render());
+window.addEventListener("hashchange", render);
+window.addEventListener("resize", () => { if (document.body.dataset.view === "exhibit") goTo(current, false); });
 
-// ---------- Screen 1: language ----------
 document.querySelectorAll("[data-pick]").forEach((b) => b.addEventListener("click", () => {
   setLang(b.dataset.pick);
-  location.hash = "entrance";
+  location.hash = "intro";
 }));
-
-// ---------- Screen 2: the entrance ----------
-document.querySelectorAll("[data-mode]").forEach((b) => b.addEventListener("click", () => {
-  const guided = b.dataset.mode === "guided";
-  store.set("tour", guided ? "1" : null);
-  $("stage").classList.add("walk");
-  const go = () => { location.hash = guided ? works[0].slug : "gallery"; };
-  matchMedia("(prefers-reduced-motion: reduce)").matches ? go() : setTimeout(go, 900);
-}));
-
-// ---------- The wall label, enlarged ----------
-function closeReader() { $("reader").hidden = true; }
-// On phones the label is already shown at reading size, so it does not open
-$("note").addEventListener("click", () => {
-  if (matchMedia("(max-width: 860px)").matches) return;
-  $("reader").hidden = false; $("reader-close").focus();
-});
-$("reader-close").addEventListener("click", closeReader);
-$("reader").addEventListener("click", (e) => { if (e.target === $("reader")) closeReader(); });
-document.addEventListener("keydown", (e) => { if (e.key === "Escape") closeReader(); });
-
-// ---------- Interactive bits inside rooms ----------
-function wireExtras(root) {
-  // Drawers
-  root.querySelectorAll(".drawer").forEach((d) => d.addEventListener("click", () => {
-    const open = d.classList.toggle("open");
-    d.setAttribute("aria-expanded", open);
-  }));
-
-  // Books
-  root.querySelectorAll(".book").forEach((b) => b.addEventListener("click", () => {
-    root.querySelectorAll(".book").forEach((x) => x.classList.toggle("out", x === b && !x.classList.contains("out")));
-    const box = root.querySelector("#book-open");
-    box.hidden = !b.classList.contains("out");
-    box.querySelector("#book-kind").dataset.i18n = b.dataset.detail === "edu" ? "lib.edu" : "lib.work";
-    box.querySelector("#book-name").textContent = b.textContent;
-    translate(box);
-  }));
-
-  // Letter (Web3Forms)
-  const form = root.querySelector("#letter");
-  if (form) form.addEventListener("submit", async (e) => {
-    e.preventDefault();
-    const status = form.querySelector("#letter-status");
-    if (form.access_key.value.startsWith("YOUR_")) { status.textContent = t("mail.off"); return; }
-    status.textContent = t("mail.sending");
-    try {
-      const res = await fetch("https://api.web3forms.com/submit", { method: "POST", body: new FormData(form) });
-      const data = await res.json();
-      if (!data.success) throw new Error(data.message);
-      form.reset();
-      status.textContent = t("mail.ok");
-    } catch {
-      status.textContent = t("mail.err");
-    }
-  });
-}
 
 // ---------- Start ----------
 let saved = null;

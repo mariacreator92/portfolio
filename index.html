@@ -7,174 +7,89 @@
   <meta name="description" content="Leonor's portfolio, as a small art collection.">
   <link rel="preconnect" href="https://fonts.googleapis.com">
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-  <link href="https://fonts.googleapis.com/css2?family=Pinyon+Script&family=Bodoni+Moda:ital,opsz,wght@0,6..96,400;1,6..96,400&family=Cormorant+Garamond:ital,wght@0,400;0,500;0,700;1,400;1,500;1,700&family=DM+Sans:wght@400;500;700&display=swap" rel="stylesheet">
+  <link href="https://fonts.googleapis.com/css2?family=Pinyon+Script&family=Instrument+Serif:ital@0;1&family=Cormorant+Garamond:ital,wght@0,400;0,500;0,700;1,400;1,500;1,700&display=swap" rel="stylesheet">
   <link rel="stylesheet" href="style.css">
 </head>
 <body>
   <header class="nav">
-    <a href="#gallery" class="logo">Leonor</a>
+    <a href="#gallery" class="overview-link" data-i18n="nav.overview">Overview</a>
     <div class="lang" role="group" aria-label="Language">
       <button type="button" data-lang="en">EN</button>
       <button type="button" data-lang="pt">PT</button>
     </div>
   </header>
 
-  <!-- Screen 1: choose a language -->
+  <!-- 1. Choose a language -->
   <section class="splash" id="splash" hidden>
     <button class="half en" data-pick="en"><span>english</span></button>
     <button class="half pt" data-pick="pt"><span>português</span></button>
   </section>
 
-  <!-- Screen 2: the entrance — looking into the gallery from the door -->
-  <section class="entrance" id="entrance" hidden>
-    <div class="stage" id="stage">
-      <img src="img/entrance.webp" alt="">
-      <div class="wall-title">
-        <p class="sig">Leonor.</p>
-        <blockquote data-i18n="e.quote">It is a truth universally acknowledged, that a young professional in possession of a portfolio must be in want of someone to see it.</blockquote>
-        <p class="cite" data-i18n="e.cite">— The curators</p>
-      </div>
-      <div class="choices">
-        <button data-mode="guided"><span class="big" data-i18n="e.guided">Guided tour</span><span class="small" data-i18n="e.guidedSub">The eight works, in order</span></button>
-        <span class="sep" aria-hidden="true"></span>
-        <button data-mode="free"><span class="big" data-i18n="e.free">Wander freely</span><span class="small" data-i18n="e.freeSub">At your own pace</span></button>
-      </div>
+  <!-- 2. Title wall -->
+  <section class="intro" id="intro" hidden>
+    <div class="intro-text">
+      <h1 class="sig">Leonor.</h1>
+      <blockquote data-i18n="e.quote">It is a truth universally acknowledged, that a young professional in possession of a portfolio must be in want of someone to see it.</blockquote>
+      <p class="cite" data-i18n="e.cite">— The curators</p>
     </div>
+    <a href="#gallery" class="arrow next-arrow" id="enter" aria-label="Enter"><svg viewBox="0 0 24 48" aria-hidden="true"><path d="M4 4l16 20L4 44"/></svg></a>
   </section>
 
-  <main>
-    <!-- Gallery wall (free visit) -->
-    <section class="gallery" id="gallery">
-      <div class="title-row">
-        <h1>Leonor</h1>
-        <dl class="label">
-          <dt data-i18n="g.exhibit">Exhibition:</dt><dd data-i18n="g.exhibitVal">Portfolio</dd>
-          <dt data-i18n="g.works">Works:</dt><dd>08</dd>
-        </dl>
+  <!-- 3. The whole collection on one wall -->
+  <section class="overview" id="gallery" hidden>
+    <div class="composition" id="composition"></div>
+  </section>
+
+  <!-- 4. The exhibition: one continuous wall -->
+  <section class="exhibit" id="exhibit" hidden>
+    <div class="strip" id="strip"></div>
+    <button type="button" class="arrow prev-arrow" id="prev" aria-label="Previous"><svg viewBox="0 0 24 48" aria-hidden="true"><path d="M20 4L4 24l16 20"/></svg></button>
+    <button type="button" class="arrow next-arrow" id="next" aria-label="Next"><svg viewBox="0 0 24 48" aria-hidden="true"><path d="M4 4l16 20L4 44"/></svg></button>
+    <p class="counter" id="counter"></p>
+  </section>
+
+  <!-- Small corner desk: flyer + contact, reachable from anywhere -->
+  <aside class="desk" id="desk">
+    <button type="button" data-open="flyer"><svg viewBox="0 0 24 24" aria-hidden="true"><path d="M6 3h9l3 3v15H6z M15 3v3h3 M9 11h6 M9 14h6 M9 17h4"/></svg><span data-i18n="desk.flyer">The exhibition</span></button>
+    <button type="button" data-open="contact"><svg viewBox="0 0 24 24" aria-hidden="true"><path d="M3 6h18v12H3z M3 6l9 7 9-7"/></svg><span data-i18n="desk.contact">Write to Leonor</span></button>
+  </aside>
+
+  <!-- Pop-up panel: audio guide, flyer or contact -->
+  <div class="panel" id="panel" hidden>
+    <div class="panel-card" id="panel-card" role="dialog" aria-modal="true">
+      <button class="panel-close" id="panel-close" type="button" aria-label="Close">×</button>
+
+      <div class="panel-body" data-panel="guide">
+        <div id="guide-labels"></div>
+        <div class="audio">
+          <svg viewBox="0 0 24 24" aria-hidden="true"><path d="M4 15v-3a8 8 0 0116 0v3 M4 15h3v5H4z M17 15h3v5h-3z"/></svg>
+          <p data-i18n="guide.soon">The audio guide is being recorded. More about this work very soon.</p>
+        </div>
       </div>
-      <p class="hint" data-i18n="g.hint">Click a painting to step inside.</p>
-      <div class="wall" id="wall"></div>
-    </section>
 
-    <!-- One room, filled in by app.js -->
-    <article class="room" id="room" hidden>
-      <p class="room-label"><span data-i18n="room.label">Room</span> <span id="room-num"></span></p>
-      <div class="room-main">
-        <button class="note" id="note" type="button">
-          <span class="note-title" id="note-title"></span>
-          <span class="note-medium" id="note-medium"></span>
-          <span class="note-text" id="note-text"></span>
-          <span class="note-hint" data-i18n="room.read">Click to read</span>
-        </button>
-        <figure class="painting"><img id="room-img" alt=""></figure>
+      <div class="panel-body" data-panel="flyer">
+        <p class="sig">Leonor.</p>
+        <p class="text" data-i18n="flyer.soon">The exhibition flyer is still at the printer's. Do come back soon.</p>
       </div>
-      <div id="room-extra"></div>
-      <nav class="room-nav">
-        <a href="#" id="prev"></a>
-        <a href="#gallery" class="back" id="back"></a>
-        <a href="#" id="next"></a>
-      </nav>
-    </article>
-  </main>
 
-  <footer>© 2026 Leonor</footer>
-
-  <!-- The wall label, enlarged -->
-  <div class="reader" id="reader" hidden>
-    <div class="reader-card" role="dialog" aria-modal="true" aria-labelledby="reader-title">
-      <button class="reader-close" id="reader-close" type="button" aria-label="Close">×</button>
-      <h2 id="reader-title"></h2>
-      <p class="medium" id="reader-medium"></p>
-      <p class="text" id="reader-text"></p>
+      <div class="panel-body" data-panel="contact">
+        <form class="letter" id="letter">
+          <!-- Web3Forms: troca pela tua access key (web3forms.com) -->
+          <input type="hidden" name="access_key" value="YOUR_WEB3FORMS_KEY">
+          <input type="hidden" name="subject" value="New letter from the portfolio">
+          <input type="checkbox" name="botcheck" class="hp" tabindex="-1" autocomplete="off">
+          <p class="salutation" data-i18n="mail.dear">Dear Leonor,</p>
+          <label><span data-i18n="mail.name">Your name</span><input name="name" required autocomplete="name"></label>
+          <label><span data-i18n="mail.email">Your email</span><input name="email" type="email" required autocomplete="email"></label>
+          <label><span data-i18n="mail.msg">Your message</span><textarea name="message" rows="5" required></textarea></label>
+          <div class="seal-row">
+            <button type="submit" class="seal" data-i18n="mail.send">Seal & send</button>
+            <p class="status" id="letter-status" role="status"></p>
+          </div>
+        </form>
+      </div>
     </div>
   </div>
-
-  <!-- ===== Extra content per room ===== -->
-
-  <!-- 05 Inventory: objects → skills -->
-  <template id="extra-inventory">
-    <section class="extra">
-      <h3 data-i18n="inv.title">Catalogue of objects</h3>
-      <ul class="catalogue">
-        <li><span class="obj" data-i18n="inv.o1">Passport</span><span class="dots"></span><span data-i18n="inv.s1">Languages · Portuguese & English</span></li>
-        <li><span class="obj" data-i18n="inv.o2">Notebook & pen</span><span class="dots"></span><span data-i18n="inv.s2">Organisation & planning</span></li>
-        <li><span class="obj" data-i18n="inv.o3">Colour swatches</span><span class="dots"></span><span data-i18n="inv.s3">Visual sense & design</span></li>
-        <li><span class="obj" data-i18n="inv.o4">Phone</span><span class="dots"></span><span data-i18n="inv.s4">Social media & content</span></li>
-        <li><span class="obj" data-i18n="inv.o5">Earphones</span><span class="dots"></span><span data-i18n="inv.s5">Listening & communication</span></li>
-        <li><span class="obj" data-i18n="inv.o6">Watch</span><span class="dots"></span><span data-i18n="inv.s6">Time management</span></li>
-      </ul>
-    </section>
-  </template>
-
-  <!-- 06 Craft: chest of drawers → platforms -->
-  <template id="extra-craft">
-    <section class="extra">
-      <h3 data-i18n="craft.title">Open a drawer</h3>
-      <div class="chest">
-        <button class="drawer" aria-expanded="false"><span class="knob"></span><span class="tool"><img src="https://cdn.jsdelivr.net/npm/simple-icons@11.0.0/icons/figma.svg" alt="">Figma</span></button>
-        <button class="drawer" aria-expanded="false"><span class="knob"></span><span class="tool"><img src="https://cdn.jsdelivr.net/npm/simple-icons@11.0.0/icons/canva.svg" alt="">Canva</span></button>
-        <button class="drawer" aria-expanded="false"><span class="knob"></span><span class="tool"><img src="https://cdn.jsdelivr.net/npm/simple-icons@11.0.0/icons/notion.svg" alt="">Notion</span></button>
-        <button class="drawer" aria-expanded="false"><span class="knob"></span><span class="tool"><img src="https://cdn.jsdelivr.net/npm/simple-icons@11.0.0/icons/instagram.svg" alt="">Instagram</span></button>
-        <button class="drawer" aria-expanded="false"><span class="knob"></span><span class="tool"><img src="https://cdn.jsdelivr.net/npm/simple-icons@11.0.0/icons/tiktok.svg" alt="">TikTok</span></button>
-        <button class="drawer" aria-expanded="false"><span class="knob"></span><span class="tool"><img src="https://cdn.jsdelivr.net/npm/simple-icons@11.0.0/icons/googledrive.svg" alt="">Google Drive</span></button>
-      </div>
-    </section>
-  </template>
-
-  <!-- 07 Personal Library: books → CV -->
-  <template id="extra-library">
-    <section class="extra">
-      <h3 data-i18n="lib.title">Take a book from the shelf</h3>
-      <div class="shelf">
-        <div class="books">
-          <button class="book c1" data-detail="edu"><span>Lusófona University</span></button>
-          <button class="book c2 thin" data-detail="edu"><span>Católica University</span></button>
-          <button class="book c3" data-detail="edu"><span>East Stroudsburg University</span></button>
-        </div>
-        <div class="bookend" aria-hidden="true"></div>
-        <div class="books">
-          <button class="book c4" data-detail="work"><span>Tony Castro Yachts</span></button>
-          <button class="book c2" data-detail="work"><span>Super Luxury Group</span></button>
-          <button class="book c5" data-detail="work"><span>Warriors Athletics</span></button>
-          <button class="book c6" data-detail="work"><span>The Adecco Group</span></button>
-          <button class="book c3 thin" data-detail="work"><span>Pantalha Lda</span></button>
-          <button class="book c4 thin" data-detail="work"><span>FNAC Portugal</span></button>
-          <button class="book c3" data-detail="work"><span>Volleyball Club</span></button>
-          <button class="book c6 thin" data-detail="work"><span>Summer Camp</span></button>
-        </div>
-      </div>
-      <div class="book-open" id="book-open" hidden>
-        <p class="kind" id="book-kind"></p>
-        <h4 id="book-name"></h4>
-        <p data-i18n="lib.placeholder">Role · years — a line or two about what you did here.</p>
-      </div>
-      <div class="cv-links">
-        <a href="#" class="gold-btn" data-i18n="lib.cv">Full résumé (PDF)</a>
-        <a href="#" class="gold-btn ghost">LinkedIn ↗</a>
-      </div>
-    </section>
-  </template>
-
-  <!-- 08 Correspondence: contact form -->
-  <template id="extra-correspondence">
-    <section class="extra">
-      <h3 data-i18n="mail.title">Write her a letter</h3>
-      <form class="letter" id="letter">
-        <!-- Web3Forms: troca pela tua access key (web3forms.com) -->
-        <input type="hidden" name="access_key" value="YOUR_WEB3FORMS_KEY">
-        <input type="hidden" name="subject" value="New letter from the portfolio">
-        <input type="checkbox" name="botcheck" class="hp" tabindex="-1" autocomplete="off">
-        <p class="salutation" data-i18n="mail.dear">Dear Leonor,</p>
-        <label><span data-i18n="mail.name">Your name</span><input name="name" required autocomplete="name"></label>
-        <label><span data-i18n="mail.email">Your email</span><input name="email" type="email" required autocomplete="email"></label>
-        <label><span data-i18n="mail.msg">Your message</span><textarea name="message" rows="6" required></textarea></label>
-        <div class="seal-row">
-          <button type="submit" class="seal" data-i18n="mail.send">Seal & send</button>
-          <p class="status" id="letter-status" role="status"></p>
-        </div>
-      </form>
-    </section>
-  </template>
 
   <script src="app.js"></script>
 </body>
