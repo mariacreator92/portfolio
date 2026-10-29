@@ -4,10 +4,10 @@
   <meta charset="utf-8">
   <meta name="viewport" content="width=device-width, initial-scale=1">
   <title>Leonor — Portfolio</title>
-  <meta name="description" content="Leonor's portfolio, as a little art gallery.">
+  <meta name="description" content="Leonor's portfolio, as a small art collection.">
   <link rel="preconnect" href="https://fonts.googleapis.com">
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-  <link href="https://fonts.googleapis.com/css2?family=Pinyon+Script&family=Cormorant+Garamond:ital,wght@0,500;0,700;1,500&family=DM+Sans:wght@400;500;700&display=swap" rel="stylesheet">
+  <link href="https://fonts.googleapis.com/css2?family=Pinyon+Script&family=Cormorant+Garamond:ital,wght@0,400;0,500;0,700;1,400;1,500;1,700&family=DM+Sans:wght@400;500;700&display=swap" rel="stylesheet">
   <link rel="stylesheet" href="style.css">
 </head>
 <body>
@@ -24,137 +24,126 @@
   <main>
     <!-- Gallery wall (home) -->
     <section class="gallery" id="gallery">
-      <div class="wall">
-        <a href="#glance" class="art">
-          <div class="frame rect tall"><div class="canvas p-glance"><i></i><i></i><i></i><i></i><i></i><i></i><i></i><i></i><i></i><i></i><i></i><i></i></div></div>
-          <span class="plaque"><b>I.</b> <span data-i18n="glance.title">My life at a glance</span></span>
-        </a>
-        <a href="#platforms" class="art">
-          <div class="frame oval"><div class="canvas p-platforms"></div></div>
-          <span class="plaque"><b>II.</b> <span data-i18n="platforms.title">Platforms I use</span></span>
-        </a>
-        <a href="#boxes" class="art">
-          <div class="frame rect ornate tall"><div class="canvas p-boxes"></div></div>
-          <span class="plaque"><b>III.</b> <span data-i18n="boxes.title">Open the boxes</span></span>
-        </a>
-        <a href="#work" class="art hanging">
-          <div class="frame rect wide"><div class="canvas p-work"></div></div>
-          <span class="plaque"><b>IV.</b> <span data-i18n="work.title">My work</span></span>
-        </a>
-        <a href="#bag" class="art">
-          <div class="frame rect ornate tall"><div class="canvas p-bag"></div></div>
-          <span class="plaque"><b>V.</b> <span data-i18n="bag.title">What's in my bag</span></span>
-        </a>
-      </div>
-
       <div class="title-row">
         <h1>Leonor</h1>
         <dl class="label">
           <dt data-i18n="g.exhibit">Exhibition:</dt><dd data-i18n="g.exhibitVal">Portfolio</dd>
-          <dt data-i18n="g.year">Year:</dt><dd>2026</dd>
+          <dt data-i18n="g.works">Works:</dt><dd>08</dd>
         </dl>
       </div>
-      <p class="hint" data-i18n="g.hint">Click a frame to step inside.</p>
+      <p class="hint" data-i18n="g.hint">Click a painting to step inside.</p>
+      <div class="wall" id="wall"></div>
     </section>
 
-    <!-- Room I -->
-    <section id="glance" class="room" hidden>
-      <p class="room-label"><span data-i18n="room.label">Room</span> I</p>
-      <h2 data-i18n="glance.title">My life at a glance</h2>
-      <!-- Para pôr fotos: troca <div class="pic"></div> por <img class="pic" src="photos/1.jpg" alt=""> -->
-      <div class="mosaic" id="mosaic"></div>
-    </section>
-
-    <!-- Room II -->
-    <section id="platforms" class="room" hidden>
-      <p class="room-label"><span data-i18n="room.label">Room</span> II</p>
-      <h2 data-i18n="platforms.title">Platforms I use</h2>
-      <ul class="logos">
-        <li><img src="https://cdn.jsdelivr.net/npm/simple-icons@11.0.0/icons/figma.svg" alt="">Figma</li>
-        <li><img src="https://cdn.jsdelivr.net/npm/simple-icons@11.0.0/icons/canva.svg" alt="">Canva</li>
-        <li><img src="https://cdn.jsdelivr.net/npm/simple-icons@11.0.0/icons/notion.svg" alt="">Notion</li>
-        <li><img src="https://cdn.jsdelivr.net/npm/simple-icons@11.0.0/icons/instagram.svg" alt="">Instagram</li>
-        <li><img src="https://cdn.jsdelivr.net/npm/simple-icons@11.0.0/icons/tiktok.svg" alt="">TikTok</li>
-        <li><img src="https://cdn.jsdelivr.net/npm/simple-icons@11.0.0/icons/pinterest.svg" alt="">Pinterest</li>
-        <li><img src="https://cdn.jsdelivr.net/npm/simple-icons@11.0.0/icons/spotify.svg" alt="">Spotify</li>
-        <li><img src="https://cdn.jsdelivr.net/npm/simple-icons@11.0.0/icons/googledrive.svg" alt="">Google Drive</li>
-      </ul>
-    </section>
-
-    <!-- Room III -->
-    <section id="boxes" class="room" hidden>
-      <p class="room-label"><span data-i18n="room.label">Room</span> III</p>
-      <h2 data-i18n="boxes.title">Open the boxes</h2>
-      <div class="boxes">
-        <div class="box yellow">
-          <button class="lid" aria-expanded="false"><span data-i18n="boxes.cover">Cover letter</span><span class="plus">+</span></button>
-          <div class="inside"><p data-i18n="boxes.coverText">Why I'd love to work with you.</p><a href="#" class="btn" data-i18n="boxes.read">Read it →</a></div>
-        </div>
-        <div class="box blue">
-          <button class="lid" aria-expanded="false"><span>LinkedIn</span><span class="plus">+</span></button>
-          <div class="inside"><p data-i18n="boxes.linkedinText">Let's connect.</p><a href="#" class="btn" data-i18n="boxes.visit">Visit →</a></div>
-        </div>
-        <div class="box pink">
-          <button class="lid" aria-expanded="false"><span data-i18n="boxes.resume">Resume</span><span class="plus">+</span></button>
-          <div class="inside"><p data-i18n="boxes.resumeText">My experience, all on one page.</p><a href="#" class="btn" data-i18n="boxes.download">Open →</a></div>
-        </div>
-        <div class="box green">
-          <button class="lid" aria-expanded="false"><span><span data-i18n="boxes.project">Project</span> 01</span><span class="plus">+</span></button>
-          <div class="inside"><p data-i18n="boxes.projectText">A short description of the project.</p><a href="#" class="btn" data-i18n="boxes.see">See it →</a></div>
-        </div>
-        <div class="box orange">
-          <button class="lid" aria-expanded="false"><span><span data-i18n="boxes.project">Project</span> 02</span><span class="plus">+</span></button>
-          <div class="inside"><p data-i18n="boxes.projectText">A short description of the project.</p><a href="#" class="btn" data-i18n="boxes.see">See it →</a></div>
-        </div>
-        <div class="box purple">
-          <button class="lid" aria-expanded="false"><span><span data-i18n="boxes.project">Project</span> 03</span><span class="plus">+</span></button>
-          <div class="inside"><p data-i18n="boxes.projectText">A short description of the project.</p><a href="#" class="btn" data-i18n="boxes.see">See it →</a></div>
+    <!-- One room, filled in by app.js -->
+    <article class="room" id="room" hidden>
+      <div class="room-main">
+        <figure class="painting"><img id="room-img" alt=""></figure>
+        <div class="wall-text">
+          <p class="room-label"><span data-i18n="room.label">Room</span> <span id="room-num"></span></p>
+          <h2 id="room-title"></h2>
+          <p class="medium" id="room-medium"></p>
+          <p class="text" id="room-text"></p>
         </div>
       </div>
-    </section>
-
-    <!-- Room IV -->
-    <section id="work" class="room" hidden>
-      <p class="room-label"><span data-i18n="room.label">Room</span> IV</p>
-      <div class="work">
-        <div class="frame arch"><div class="canvas photo"><span data-i18n="work.photo">your photo here</span></div></div>
-        <div>
-          <h2 data-i18n="work.title">My work</h2>
-          <ul class="worklist">
-            <li><a href="#"><span data-i18n="work.item">Work title</span> <em>2026</em><b>↗</b></a></li>
-            <li><a href="#"><span data-i18n="work.item">Work title</span> <em>2025</em><b>↗</b></a></li>
-            <li><a href="#"><span data-i18n="work.item">Work title</span> <em>2025</em><b>↗</b></a></li>
-            <li><a href="#"><span data-i18n="work.item">Work title</span> <em>2024</em><b>↗</b></a></li>
-          </ul>
-        </div>
-      </div>
-    </section>
-
-    <!-- Room V -->
-    <section id="bag" class="room" hidden>
-      <p class="room-label"><span data-i18n="room.label">Room</span> V</p>
-      <h2 data-i18n="bag.title">What's in my bag</h2>
-      <div class="bagwrap">
-        <div class="bagicon">👜</div>
-        <ul class="items">
-          <li class="yellow">✏️ <span data-i18n="bag.s1">Creativity</span></li>
-          <li class="pink">💬 <span data-i18n="bag.s2">Communication</span></li>
-          <li class="blue">🗂️ <span data-i18n="bag.s3">Organisation</span></li>
-          <li class="green">📸 <span data-i18n="bag.s4">Content creation</span></li>
-          <li class="orange">🎨 <span data-i18n="bag.s5">Design</span></li>
-          <li class="purple">🌍 <span data-i18n="bag.s6">Languages</span></li>
-        </ul>
-      </div>
-    </section>
-
-    <nav class="room-nav" hidden>
-      <a href="#" data-i18n="room.back">← Back to the gallery</a>
-      <a href="#" id="next" data-i18n="room.next">Next room →</a>
-    </nav>
+      <div id="room-extra"></div>
+      <nav class="room-nav">
+        <a href="#" id="prev"></a>
+        <a href="#" class="back" data-i18n="room.back">Back to the gallery</a>
+        <a href="#" id="next"></a>
+      </nav>
+    </article>
   </main>
 
   <footer>© 2026 Leonor</footer>
 
-  <script src="i18n.js"></script>
+  <!-- ===== Extra content per room ===== -->
+
+  <!-- 05 Inventory: objects → skills -->
+  <template id="extra-inventory">
+    <section class="extra">
+      <h3 data-i18n="inv.title">Catalogue of objects</h3>
+      <ul class="catalogue">
+        <li><span class="obj" data-i18n="inv.o1">Passport</span><span class="dots"></span><span data-i18n="inv.s1">Languages · Portuguese & English</span></li>
+        <li><span class="obj" data-i18n="inv.o2">Notebook & pen</span><span class="dots"></span><span data-i18n="inv.s2">Organisation & planning</span></li>
+        <li><span class="obj" data-i18n="inv.o3">Colour swatches</span><span class="dots"></span><span data-i18n="inv.s3">Visual sense & design</span></li>
+        <li><span class="obj" data-i18n="inv.o4">Phone</span><span class="dots"></span><span data-i18n="inv.s4">Social media & content</span></li>
+        <li><span class="obj" data-i18n="inv.o5">Earphones</span><span class="dots"></span><span data-i18n="inv.s5">Listening & communication</span></li>
+        <li><span class="obj" data-i18n="inv.o6">Watch</span><span class="dots"></span><span data-i18n="inv.s6">Time management</span></li>
+      </ul>
+    </section>
+  </template>
+
+  <!-- 06 Craft: chest of drawers → platforms -->
+  <template id="extra-craft">
+    <section class="extra">
+      <h3 data-i18n="craft.title">Open a drawer</h3>
+      <div class="chest">
+        <button class="drawer" aria-expanded="false"><span class="knob"></span><span class="tool"><img src="https://cdn.jsdelivr.net/npm/simple-icons@11.0.0/icons/figma.svg" alt="">Figma</span></button>
+        <button class="drawer" aria-expanded="false"><span class="knob"></span><span class="tool"><img src="https://cdn.jsdelivr.net/npm/simple-icons@11.0.0/icons/canva.svg" alt="">Canva</span></button>
+        <button class="drawer" aria-expanded="false"><span class="knob"></span><span class="tool"><img src="https://cdn.jsdelivr.net/npm/simple-icons@11.0.0/icons/notion.svg" alt="">Notion</span></button>
+        <button class="drawer" aria-expanded="false"><span class="knob"></span><span class="tool"><img src="https://cdn.jsdelivr.net/npm/simple-icons@11.0.0/icons/instagram.svg" alt="">Instagram</span></button>
+        <button class="drawer" aria-expanded="false"><span class="knob"></span><span class="tool"><img src="https://cdn.jsdelivr.net/npm/simple-icons@11.0.0/icons/tiktok.svg" alt="">TikTok</span></button>
+        <button class="drawer" aria-expanded="false"><span class="knob"></span><span class="tool"><img src="https://cdn.jsdelivr.net/npm/simple-icons@11.0.0/icons/googledrive.svg" alt="">Google Drive</span></button>
+      </div>
+    </section>
+  </template>
+
+  <!-- 07 Personal Library: books → CV -->
+  <template id="extra-library">
+    <section class="extra">
+      <h3 data-i18n="lib.title">Take a book from the shelf</h3>
+      <div class="shelf">
+        <div class="books">
+          <button class="book c1" data-detail="edu"><span>Lusófona University</span></button>
+          <button class="book c2 thin" data-detail="edu"><span>Católica University</span></button>
+          <button class="book c3" data-detail="edu"><span>East Stroudsburg University</span></button>
+        </div>
+        <div class="bookend" aria-hidden="true"></div>
+        <div class="books">
+          <button class="book c4" data-detail="work"><span>Tony Castro Yachts</span></button>
+          <button class="book c2" data-detail="work"><span>Super Luxury Group</span></button>
+          <button class="book c5" data-detail="work"><span>Warriors Athletics</span></button>
+          <button class="book c6" data-detail="work"><span>The Adecco Group</span></button>
+          <button class="book c3 thin" data-detail="work"><span>Pantalha Lda</span></button>
+          <button class="book c4 thin" data-detail="work"><span>FNAC Portugal</span></button>
+          <button class="book c3" data-detail="work"><span>Volleyball Club</span></button>
+          <button class="book c6 thin" data-detail="work"><span>Summer Camp</span></button>
+        </div>
+      </div>
+      <div class="book-open" id="book-open" hidden>
+        <p class="kind" id="book-kind"></p>
+        <h4 id="book-name"></h4>
+        <p data-i18n="lib.placeholder">Role · years — a line or two about what you did here.</p>
+      </div>
+      <div class="cv-links">
+        <a href="#" class="gold-btn" data-i18n="lib.cv">Full résumé (PDF)</a>
+        <a href="#" class="gold-btn ghost">LinkedIn ↗</a>
+      </div>
+    </section>
+  </template>
+
+  <!-- 08 Correspondence: contact form -->
+  <template id="extra-correspondence">
+    <section class="extra">
+      <h3 data-i18n="mail.title">Write her a letter</h3>
+      <form class="letter" id="letter">
+        <!-- Web3Forms: troca pela tua access key (web3forms.com) -->
+        <input type="hidden" name="access_key" value="YOUR_WEB3FORMS_KEY">
+        <input type="hidden" name="subject" value="New letter from the portfolio">
+        <input type="checkbox" name="botcheck" class="hp" tabindex="-1" autocomplete="off">
+        <p class="salutation" data-i18n="mail.dear">Dear Leonor,</p>
+        <label><span data-i18n="mail.name">Your name</span><input name="name" required autocomplete="name"></label>
+        <label><span data-i18n="mail.email">Your email</span><input name="email" type="email" required autocomplete="email"></label>
+        <label><span data-i18n="mail.msg">Your message</span><textarea name="message" rows="6" required></textarea></label>
+        <div class="seal-row">
+          <button type="submit" class="seal" data-i18n="mail.send">Seal & send</button>
+          <p class="status" id="letter-status" role="status"></p>
+        </div>
+      </form>
+    </section>
+  </template>
+
+  <script src="app.js"></script>
 </body>
 </html>
