@@ -14,15 +14,42 @@
   <div class="molding" aria-hidden="true"></div>
 
   <header class="nav">
-    <a href="#" class="logo">Leonor</a>
+    <a href="#gallery" class="logo">Leonor</a>
     <div class="lang" role="group" aria-label="Language">
       <button type="button" data-lang="en">EN</button>
       <button type="button" data-lang="pt">PT</button>
     </div>
   </header>
 
+  <!-- Screen 1: choose a language -->
+  <section class="splash" id="splash" hidden>
+    <p class="splash-name">Leonor</p>
+    <button class="half" data-pick="en"><span class="big">English</span><span class="small">Enter the gallery</span></button>
+    <button class="half" data-pick="pt"><span class="big">Português</span><span class="small">Entrar na galeria</span></button>
+  </section>
+
+  <!-- Screen 2: the entrance — the gallery seen from the door -->
+  <section class="entrance" id="entrance" hidden>
+    <div class="corridor" aria-hidden="true">
+      <div class="hall" id="hall">
+        <div class="w left" id="wall-left"></div>
+        <div class="w right" id="wall-right"></div>
+        <div class="w floor"></div>
+        <div class="w ceiling"></div>
+        <div class="w back"><span>Leonor</span></div>
+      </div>
+    </div>
+    <div class="doors">
+      <p class="welcome" data-i18n="e.welcome">Welcome. How would you like to visit?</p>
+      <div class="door-row">
+        <button class="door" data-mode="guided"><span class="big" data-i18n="e.guided">Guided tour</span><span class="small" data-i18n="e.guidedSub">The eight works, in order</span></button>
+        <button class="door" data-mode="free"><span class="big" data-i18n="e.free">Wander freely</span><span class="small" data-i18n="e.freeSub">The whole collection, at your own pace</span></button>
+      </div>
+    </div>
+  </section>
+
   <main>
-    <!-- Gallery wall (home) -->
+    <!-- Gallery wall (free visit) -->
     <section class="gallery" id="gallery">
       <div class="title-row">
         <h1>Leonor</h1>
@@ -49,7 +76,7 @@
       <div id="room-extra"></div>
       <nav class="room-nav">
         <a href="#" id="prev"></a>
-        <a href="#" class="back" data-i18n="room.back">Back to the gallery</a>
+        <a href="#gallery" class="back" id="back"></a>
         <a href="#" id="next"></a>
       </nav>
     </article>

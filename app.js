@@ -79,6 +79,10 @@ const ui = {
     "g.exhibit": "Exhibition:", "g.exhibitVal": "Portfolio", "g.works": "Works:",
     "g.hint": "Click a painting to step inside.",
     "room.label": "Room", "room.back": "Back to the gallery",
+    "e.welcome": "Welcome. How would you like to visit?",
+    "e.guided": "Guided tour", "e.guidedSub": "The eight works, in order",
+    "e.free": "Wander freely", "e.freeSub": "The whole collection, at your own pace",
+    "tour.of": "of", "tour.work": "Work", "tour.next": "Next work →", "tour.end": "End the tour →", "tour.exit": "Leave the guided tour",
     "inv.title": "Catalogue of objects",
     "inv.o1": "Passport", "inv.s1": "Languages · Portuguese & English",
     "inv.o2": "Notebook & pen", "inv.s2": "Organisation & planning",
@@ -102,6 +106,10 @@ const ui = {
     "g.exhibit": "Exposição:", "g.exhibitVal": "Portfólio", "g.works": "Obras:",
     "g.hint": "Clica num quadro para entrar.",
     "room.label": "Sala", "room.back": "Voltar à galeria",
+    "e.welcome": "Boas-vindas. Como queres fazer a visita?",
+    "e.guided": "Visita guiada", "e.guidedSub": "As oito obras, por ordem",
+    "e.free": "Visita livre", "e.freeSub": "Toda a coleção, ao teu ritmo",
+    "tour.of": "de", "tour.work": "Obra", "tour.next": "Próxima obra →", "tour.end": "Terminar a visita →", "tour.exit": "Sair da visita guiada",
     "inv.title": "Catálogo de objetos",
     "inv.o1": "Passaporte", "inv.s1": "Línguas · Português e Inglês",
     "inv.o2": "Caderno e caneta", "inv.s2": "Organização e planeamento",
@@ -164,26 +172,47 @@ function buildWall() {
 // ---------- Rooms ----------
 const $ = (id) => document.getElementById(id);
 
+// Guided tour lives in sessionStorage so a reload keeps you in it
+const store = {
+  get: (k) => { try { return sessionStorage.getItem(k); } catch { return null; } },
+  set: (k, v) => { try { v == null ? sessionStorage.removeItem(k) : sessionStorage.setItem(k, v); } catch {} },
+};
+const touring = () => store.get("tour") === "1";
+
 function render(scroll = true) {
-  const w = works.find((x) => x.slug === location.hash.slice(1));
-  $("gallery").hidden = !!w;
-  $("room").hidden = !w;
+  const hash = location.hash.slice(1);
+  const w = works.find((x) => x.slug === hash);
+  const view = w ? "room" : hash === "gallery" ? "gallery" : hash === "entrance" ? "entrance" : "splash";
+  if (view === "gallery") store.set("tour", null);
+  document.body.dataset.view = view;
+  $("splash").hidden = view !== "splash";
+  $("entrance").hidden = view !== "entrance";
+  $("gallery").hidden = view !== "gallery";
+  $("room").hidden = view !== "room";
+  if (view === "entrance") $("hall").classList.remove("walk");
+  if (scroll) window.scrollTo({ top: 0, behavior: "instant" });
   if (!w) return;
 
   const i = works.indexOf(w);
   const prev = works[(i + works.length - 1) % works.length];
   const next = works[(i + 1) % works.length];
+  const tour = touring();
 
   $("room-img").src = `img/${pad(w.n)}-canvas.webp`;
   $("room-img").alt = w.title[lang];
-  $("room-num").textContent = roman[w.n - 1];
+  $("room-num").textContent = tour ? `${roman[w.n - 1]} · ${t("tour.work")} ${w.n} ${t("tour.of")} ${works.length}` : roman[w.n - 1];
   $("room-title").textContent = w.title[lang] + ".";
   $("room-medium").textContent = `${w.medium[lang]}, ${w.year}`;
   $("room-text").textContent = w.text[lang];
+
+  const last = i === works.length - 1;
+  $("prev").hidden = tour && i === 0;
   $("prev").href = "#" + prev.slug;
   $("prev").textContent = "← " + prev.title[lang];
-  $("next").href = "#" + next.slug;
-  $("next").textContent = next.title[lang] + " →";
+  $("back").textContent = t(tour ? "tour.exit" : "room.back");
+  $("next").href = tour && last ? "#gallery" : "#" + next.slug;
+  $("next").textContent = tour ? t(last ? "tour.end" : "tour.next") : next.title[lang] + " →";
+  $("next").classList.toggle("gold-btn", tour);
 
   const extra = $("room-extra");
   const tpl = document.getElementById("extra-" + w.slug);
@@ -193,12 +222,32 @@ function render(scroll = true) {
     if (tpl) { extra.appendChild(tpl.content.cloneNode(true)); wireExtras(extra); }
   }
   translate(extra);
-  if (scroll) {
-    $("room").classList.remove("enter"); void $("room").offsetWidth; $("room").classList.add("enter");
-    window.scrollTo({ top: 0, behavior: "instant" });
-  }
+  if (scroll) { $("room").classList.remove("enter"); void $("room").offsetWidth; $("room").classList.add("enter"); }
 }
 window.addEventListener("hashchange", () => render());
+
+// ---------- Screen 1: language ----------
+document.querySelectorAll("[data-pick]").forEach((b) => b.addEventListener("click", () => {
+  setLang(b.dataset.pick);
+  location.hash = "entrance";
+}));
+
+// ---------- Screen 2: the entrance ----------
+// Paintings hung along the two side walls, seen from afar
+function buildEntrance() {
+  const side = (list) => list.map((n, k) =>
+    `<img src="img/${pad(n)}-frame.webp" alt="" style="left:${160 + k * 330}px">`).join("");
+  $("wall-left").innerHTML = side([1, 3, 5, 7]);
+  $("wall-right").innerHTML = side([2, 4, 6, 8]).replace(/left:/g, "right:");
+}
+
+document.querySelectorAll("[data-mode]").forEach((b) => b.addEventListener("click", () => {
+  const guided = b.dataset.mode === "guided";
+  store.set("tour", guided ? "1" : null);
+  $("hall").classList.add("walk");
+  const go = () => { location.hash = guided ? works[0].slug : "gallery"; };
+  matchMedia("(prefers-reduced-motion: reduce)").matches ? go() : setTimeout(go, 850);
+}));
 
 // ---------- Interactive bits inside rooms ----------
 function wireExtras(root) {
@@ -240,4 +289,5 @@ function wireExtras(root) {
 // ---------- Start ----------
 let saved = null;
 try { saved = localStorage.getItem("lang"); } catch {}
+buildEntrance();
 setLang(saved || (navigator.language.startsWith("pt") ? "pt" : "en"));

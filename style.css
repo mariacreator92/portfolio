@@ -234,3 +234,121 @@ footer { padding-top: 24px; padding-bottom: 40px; color: var(--muted); font-size
 @media (prefers-reduced-motion: reduce) {
   * { transition: none !important; animation: none !important; }
 }
+
+/* ---------- Screen 1: language ---------- */
+body[data-view="splash"] .nav, body[data-view="splash"] footer,
+body[data-view="entrance"] footer { display: none; }
+.splash {
+  position: relative; display: flex; height: calc(100svh - 34px);
+}
+.splash-name {
+  position: absolute; top: 28px; left: 50%; transform: translateX(-50%); z-index: 2;
+  font-family: "Pinyon Script", cursive; font-size: 40px; color: var(--gold); pointer-events: none;
+}
+.half {
+  flex: 1; border: 0; cursor: pointer; background: transparent;
+  display: flex; flex-direction: column; align-items: center; justify-content: center; gap: 10px;
+  transition: flex-grow .5s ease, background .5s ease;
+}
+.half + .half { border-left: 1px solid rgba(214,166,75,.45); background: rgba(0,0,0,.18); }
+.half .big {
+  font-family: "Cormorant Garamond", serif; font-style: italic; font-weight: 500;
+  font-size: clamp(44px, 7vw, 96px); line-height: 1; color: var(--cream);
+  transition: color .4s ease, text-shadow .4s ease;
+}
+.half .small {
+  font-family: "Cormorant Garamond", serif; font-weight: 700; font-size: 14px; letter-spacing: .25em;
+  text-transform: uppercase; color: var(--gold); opacity: .7; transition: opacity .4s ease;
+}
+.half:hover, .half:focus-visible { flex-grow: 1.25; background: radial-gradient(circle at 50% 50%, rgba(214,166,75,.12), transparent 65%); outline: none; }
+.half:hover .big, .half:focus-visible .big { color: var(--gold); text-shadow: 0 0 30px rgba(214,166,75,.35); }
+.half:hover .small, .half:focus-visible .small { opacity: 1; }
+
+/* ---------- Screen 2: the entrance ---------- */
+.entrance { position: relative; height: calc(100svh - 34px - 76px); min-height: 520px; overflow: hidden; }
+.corridor {
+  position: absolute; inset: 0; perspective: 700px; perspective-origin: 50% 42%;
+  overflow: hidden;
+}
+.hall {
+  position: absolute; inset: 0; transform-style: preserve-3d;
+  animation: approach 7s ease-out both;
+}
+.hall.walk { animation: walk .85s ease-in forwards; }
+@keyframes approach { from { transform: translateZ(-260px); } to { transform: translateZ(0); } }
+@keyframes walk { from { transform: translateZ(0); opacity: 1; } to { transform: translateZ(1300px); opacity: 0; } }
+
+.w { position: absolute; backface-visibility: hidden; }
+.left, .right {
+  top: 0; width: 1600px; height: 100%;
+  background:
+    linear-gradient(to bottom, transparent 0 22px, rgba(214,166,75,.55) 22px 26px, transparent 26px),
+    linear-gradient(to top, #121a17 0 12%, transparent 12%),
+    linear-gradient(var(--wall), var(--wall));
+}
+.left { left: 0; transform-origin: left center; transform: rotateY(90deg); }
+.right { right: 0; transform-origin: right center; transform: rotateY(-90deg); }
+.left::after, .right::after { content: ""; position: absolute; inset: 0; pointer-events: none; }
+.left::after { background: linear-gradient(to right, rgba(0,0,0,0), rgba(0,0,0,.7)); }
+.right::after { background: linear-gradient(to left, rgba(0,0,0,0), rgba(0,0,0,.7)); }
+.left img, .right img {
+  position: absolute; top: 34%; height: 30%; width: auto;
+  filter: blur(1.6px) brightness(.85) drop-shadow(0 10px 12px rgba(0,0,0,.5));
+}
+.floor {
+  bottom: 0; left: 0; width: 100%; height: 1600px; transform-origin: bottom center; transform: rotateX(90deg);
+  background:
+    repeating-linear-gradient(90deg, rgba(0,0,0,.25) 0 2px, transparent 2px 120px),
+    linear-gradient(to top, #6b4423, #2a190d);
+}
+.ceiling {
+  top: 0; left: 0; width: 100%; height: 1600px; transform-origin: top center; transform: rotateX(-90deg);
+  background:
+    repeating-linear-gradient(to bottom, transparent 0 240px, rgba(255,236,190,.22) 240px 252px),
+    linear-gradient(#0e1412, #1b2622);
+}
+.back {
+  inset: 0; transform: translateZ(-1600px);
+  background: radial-gradient(ellipse at 50% 45%, #2c3d37, #111816 75%);
+  display: grid; place-items: center;
+}
+.back span {
+  font-family: "Pinyon Script", cursive; font-size: 260px; color: var(--gold);
+  text-shadow: 0 0 60px rgba(214,166,75,.35); filter: blur(1px);
+}
+.corridor::after {
+  content: ""; position: absolute; inset: 0; pointer-events: none;
+  background: radial-gradient(ellipse at 50% 45%, transparent 35%, rgba(0,0,0,.55) 100%);
+}
+
+.doors {
+  position: absolute; left: 0; right: 0; bottom: 0; z-index: 2;
+  padding: 80px 20px 36px; text-align: center;
+  background: linear-gradient(to top, rgba(10,14,12,.95) 30%, transparent);
+}
+.welcome { font-family: "Cormorant Garamond", serif; font-style: italic; font-size: 22px; color: var(--cream); margin-bottom: 18px; }
+.door-row { display: flex; justify-content: center; gap: 18px; flex-wrap: wrap; }
+.door {
+  width: 280px; padding: 18px 22px; cursor: pointer; border-radius: 140px 140px 4px 4px;
+  background: rgba(22,31,28,.75); border: 1px solid var(--gold); backdrop-filter: blur(4px);
+  display: flex; flex-direction: column; gap: 4px; align-items: center;
+  transition: background .3s ease, transform .3s ease, box-shadow .3s ease;
+}
+.door .big { font-family: "Cormorant Garamond", serif; font-weight: 700; font-size: 26px; color: var(--gold); }
+.door .small { font-family: "Cormorant Garamond", serif; font-style: italic; font-size: 17px; color: var(--muted); }
+.door:hover, .door:focus-visible { background: rgba(214,166,75,.16); transform: translateY(-4px); box-shadow: 0 0 30px rgba(214,166,75,.25); outline: none; }
+
+.room-nav .gold-btn { color: var(--wall-dark); }
+.room-nav .gold-btn:hover { color: var(--wall-dark); }
+
+@media (max-width: 860px) {
+  .splash { flex-direction: column; }
+  .half + .half { border-left: 0; border-top: 1px solid rgba(214,166,75,.45); }
+  .splash-name { top: auto; bottom: 50%; transform: translate(-50%, 50%); font-size: 30px; background: var(--wall-dark); padding: 0 14px; border-radius: 999px; }
+  .entrance { height: calc(100svh - 34px - 76px); }
+  .corridor { perspective: 420px; }
+  .back span { font-size: 120px; }
+  .door { width: 100%; max-width: 320px; padding: 14px 18px; }
+  .door .big { font-size: 22px; }
+  .welcome { font-size: 19px; }
+}
