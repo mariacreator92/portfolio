@@ -1,20 +1,22 @@
+/* Warm, dimly lit gallery — palette taken from Leonor's references */
 :root {
   color-scheme: dark;
-  --wall: #22302b;
-  --wall-dark: #161f1c;
+  --wall: #3b2b20;
+  --wall-dark: #18110c;
   --cream: #f3ead7;
-  --muted: #b5ad99;
+  --muted: #b9a98f;
   --gold: #d6a64b;
   --gold-grad: linear-gradient(135deg, #6e4a14, #d9a94a 18%, #f7df92 32%, #b07d2b 48%, #ecc96f 62%, #8a5f1c 80%, #d4a446);
   --burgundy: #7b2335;
   --paper: #f6efe0;
   --ink: #2a2420;
+  --spot: rgba(255, 205, 150, .16);
 }
 
 * { box-sizing: border-box; margin: 0; padding: 0; }
 [hidden] { display: none !important; }
 body {
-  background: radial-gradient(ellipse at 50% 30%, var(--wall), var(--wall-dark) 85%) fixed;
+  background: radial-gradient(ellipse 90% 70% at 50% 0%, #4a3627, var(--wall-dark) 80%) fixed, var(--wall-dark);
   color: var(--cream);
   font: 400 17px/1.6 "DM Sans", system-ui, sans-serif;
   -webkit-font-smoothing: antialiased;
@@ -24,48 +26,93 @@ body {
 a { color: inherit; text-decoration: none; }
 button { font: inherit; color: inherit; }
 
-.molding {
-  height: 34px;
-  background: repeating-linear-gradient(90deg, rgba(0,0,0,.25) 0 2px, transparent 2px 22px), var(--gold-grad);
-  box-shadow: 0 6px 14px rgba(0,0,0,.45), inset 0 -4px 0 rgba(0,0,0,.3);
-}
-
 .nav, main, footer { max-width: 1200px; margin: 0 auto; padding: 0 20px; }
-.nav { display: flex; justify-content: space-between; align-items: center; padding-top: 18px; padding-bottom: 18px; }
+.nav { display: flex; justify-content: space-between; align-items: center; padding-top: 18px; padding-bottom: 18px; position: relative; z-index: 5; }
 .logo { font-family: "Pinyon Script", cursive; font-size: 34px; color: var(--gold); }
-.lang { display: flex; border: 1px solid var(--gold); border-radius: 999px; padding: 2px; }
+.lang { display: flex; border: 1px solid rgba(214,166,75,.7); border-radius: 999px; padding: 2px; margin-left: auto; background: rgba(24,17,12,.4); backdrop-filter: blur(4px); }
 .lang button {
   font: 700 12px/1 "DM Sans", sans-serif; letter-spacing: .08em;
   background: none; border: 0; color: var(--gold); padding: 6px 10px; border-radius: 999px; cursor: pointer;
 }
 .lang button[aria-pressed="true"] { background: var(--gold); color: var(--wall-dark); }
 
-/* ---------- Gallery ---------- */
+/* ---------- Screen 1: language ---------- */
+body[data-view="splash"] .nav, body[data-view="splash"] footer, body[data-view="entrance"] footer { display: none; }
+.splash { display: flex; height: 100svh; background: #000; }
+.half { position: relative; flex: 1; border: 0; cursor: pointer; overflow: hidden; background: none; display: grid; place-items: center; }
+.half::before {
+  content: ""; position: absolute; inset: 0; background: center / cover no-repeat;
+  transition: filter .8s ease, transform 1.6s ease;
+}
+.half.en::before { background-image: url(img/lang-en.webp); }
+.half.pt::before { background-image: url(img/lang-pt.webp); }
+.half span {
+  position: relative; font-family: "Pinyon Script", cursive; font-size: clamp(34px, 3.6vw, 58px);
+  color: var(--cream); transition: text-shadow .6s ease, letter-spacing .6s ease;
+}
+.half:hover::before, .half:focus-visible::before { filter: brightness(1.45); transform: scale(1.03); }
+.half:hover span, .half:focus-visible span { text-shadow: 0 0 24px rgba(255,230,190,.45); }
+.half:focus-visible { outline: none; }
+
+/* ---------- Screen 2: the entrance ---------- */
+body[data-view="entrance"] .nav { position: absolute; left: 0; right: 0; max-width: none; }
+body[data-view="entrance"] .logo { display: none; }
+body[data-view="entrance"] main { display: none; }
+.entrance { position: relative; height: 100svh; overflow: hidden; background: #120d0a; }
+/* The stage keeps the photo's proportions and covers the screen, so text stays on the wall */
+.stage {
+  position: absolute; left: 50%; top: 0;
+  width: max(100vw, calc(100svh * 2400 / 1610)); aspect-ratio: 2400 / 1610;
+  transform: translateX(-50%); transform-origin: 50% 42%;
+  container-type: inline-size;
+  animation: settle 2.4s ease-out both;
+}
+.stage > img { width: 100%; height: 100%; display: block; }
+@keyframes settle { from { transform: translateX(-50%) scale(1.06); opacity: 0; } to { transform: translateX(-50%) scale(1); opacity: 1; } }
+.stage.walk { animation: walk .9s ease-in forwards; }
+@keyframes walk { to { transform: translateX(-50%) scale(1.9); opacity: 0; } }
+
+.wall-title { position: absolute; left: 35%; right: 36%; top: 23.4%; color: #f6ecdc; }
+.sig { font-family: "Pinyon Script", cursive; font-size: 5cqw; line-height: 1; text-shadow: 0 0 2cqw rgba(255,220,170,.25); }
+.wall-title blockquote {
+  font-family: "Bodoni Moda", serif; font-size: max(1cqw, 11px); line-height: 1.32;
+  text-align: right; max-width: 27cqw; margin: .9cqw 0 0 auto; letter-spacing: 0;
+}
+.cite { font-family: "Bodoni Moda", serif; font-size: max(.8cqw, 9px); text-align: right; margin-top: .4cqw; opacity: .85; }
+
+.choices { position: absolute; left: 50%; top: 44.5%; transform: translateX(-50%); display: flex; align-items: center; gap: 2.2cqw; white-space: nowrap; }
+.choices button {
+  background: none; border: 0; cursor: pointer; color: #f6ecdc;
+  display: flex; flex-direction: column; align-items: center; gap: .25cqw; padding: .4cqw .6cqw;
+}
+.choices .big { font-family: "Bodoni Moda", serif; font-style: italic; font-size: max(1.6cqw, 16px); transition: color .3s ease, text-shadow .3s ease; }
+.choices .small { font-family: "Bodoni Moda", serif; font-size: max(.7cqw, 9px); letter-spacing: .22em; text-transform: uppercase; opacity: .7; }
+.choices button:hover .big, .choices button:focus-visible .big { color: var(--gold); text-shadow: 0 0 18px rgba(214,166,75,.45); }
+.choices button:focus-visible { outline: none; }
+.sep { width: 1px; height: max(2.6cqw, 28px); background: rgba(246,236,220,.4); }
+
+/* ---------- Gallery wall (free visit) ---------- */
 .gallery { padding: 8px 0 48px; }
 .title-row { display: flex; justify-content: space-between; align-items: flex-end; flex-wrap: wrap; gap: 16px 24px; }
 h1 {
   font-family: "Pinyon Script", cursive; font-weight: 400;
-  font-size: clamp(80px, 13vw, 160px); line-height: .9; color: var(--gold);
-  text-shadow: 0 4px 18px rgba(0,0,0,.35);
+  font-size: clamp(80px, 13vw, 160px); line-height: .9; color: var(--cream);
+  text-shadow: 0 0 40px rgba(255,220,170,.18);
 }
 .label {
   display: grid; grid-template-columns: auto auto; gap: 4px 24px; margin-bottom: 18px;
-  font-family: "Cormorant Garamond", serif; font-weight: 700; letter-spacing: .14em;
-  text-transform: uppercase; color: var(--gold); font-size: 15px;
+  font-family: "Bodoni Moda", serif; letter-spacing: .14em;
+  text-transform: uppercase; color: var(--gold); font-size: 13px;
 }
 .label dd { color: var(--cream); }
-.hint { font-family: "Cormorant Garamond", serif; font-style: italic; color: var(--muted); font-size: 20px; margin: 4px 0 40px; }
+.hint { font-family: "Bodoni Moda", serif; font-style: italic; color: var(--muted); font-size: 17px; margin: 4px 0 40px; }
 
 .wall { display: flex; flex-wrap: wrap; justify-content: center; align-items: center; gap: 48px 40px; }
 .row-break { flex-basis: 100%; height: 0; }
 .art { display: flex; flex-direction: column; align-items: center; gap: 14px; transition: transform .35s ease; }
-.art img {
-  height: var(--h); width: auto; display: block;
-  filter: drop-shadow(0 18px 22px rgba(0,0,0,.55));
-  transition: filter .35s ease;
-}
+.art img { height: var(--h); width: auto; display: block; filter: drop-shadow(0 18px 22px rgba(0,0,0,.6)); transition: filter .35s ease; }
 .art:hover { transform: translateY(-8px); }
-.art:hover img { filter: drop-shadow(0 26px 30px rgba(0,0,0,.6)) drop-shadow(0 0 22px rgba(214,166,75,.35)); }
+.art:hover img { filter: drop-shadow(0 26px 30px rgba(0,0,0,.65)) drop-shadow(0 0 22px rgba(255,205,150,.3)); }
 .plaque {
   font-family: "Cormorant Garamond", serif; font-size: 15px; font-weight: 700; letter-spacing: .05em;
   color: var(--wall-dark); background: var(--gold-grad);
@@ -73,20 +120,50 @@ h1 {
 }
 
 /* ---------- Room ---------- */
-.room { padding: 24px 0 8px; }
-.room.enter { animation: enter .5s ease; }
-@keyframes enter { from { opacity: 0; transform: scale(.98); } to { opacity: 1; transform: none; } }
-.room-main { display: grid; grid-template-columns: 1.15fr 1fr; gap: 56px; align-items: center; }
-.painting img {
-  width: 100%; height: auto; max-height: 76vh; object-fit: contain; display: block;
-  border: 10px solid transparent; border-image: var(--gold-grad) 1;
-  box-shadow: 0 24px 50px rgba(0,0,0,.55);
+.room { padding: 8px 0; }
+.room.enter { animation: enter .6s ease; }
+@keyframes enter { from { opacity: 0; } to { opacity: 1; } }
+.room-label { font-family: "Bodoni Moda", serif; letter-spacing: .2em; text-transform: uppercase; color: var(--gold); font-size: 12px; }
+.room-main {
+  display: flex; justify-content: center; align-items: flex-end; gap: 56px;
+  padding: 40px 0 24px;
 }
-.wall-text { font-family: "Cormorant Garamond", serif; max-width: 520px; }
-.room-label { font-weight: 700; letter-spacing: .2em; text-transform: uppercase; color: var(--gold); font-size: 14px; margin-bottom: 10px; }
-h2 { font-weight: 700; font-size: clamp(36px, 4.5vw, 52px); line-height: 1.05; }
-.medium { font-style: italic; font-size: 22px; color: var(--gold); margin: 6px 0 22px; }
-.text { font-size: 21px; line-height: 1.55; text-align: justify; hyphens: auto; }
+/* Spotlight from the ceiling onto the painting */
+body[data-view="room"] {
+  background: radial-gradient(ellipse 38% 75% at 60% 0%, var(--spot), transparent 75%) fixed,
+    radial-gradient(ellipse 90% 70% at 50% 0%, #4a3627, var(--wall-dark) 80%) fixed, var(--wall-dark);
+}
+.painting img {
+  display: block; height: min(70vh, 660px); width: auto; max-width: min(60vw, 780px); object-fit: contain;
+  filter: drop-shadow(0 30px 40px rgba(0,0,0,.6));
+}
+/* Small wall label beside the painting, like in a museum */
+.note {
+  width: 210px; margin-bottom: 4%; flex-shrink: 0;
+  background: none; border: 0; cursor: zoom-in; text-align: left;
+  display: flex; flex-direction: column; gap: 4px;
+  font-family: "Cormorant Garamond", serif; color: var(--cream); opacity: .82;
+  transition: opacity .3s ease, transform .3s ease;
+}
+.note:hover, .note:focus-visible { opacity: 1; transform: scale(1.03); outline: none; }
+.note-title { font-weight: 700; font-size: 13px; }
+.note-medium { font-style: italic; font-size: 12px; color: var(--gold); }
+.note-text { font-size: 11px; line-height: 1.45; text-align: justify; hyphens: auto; }
+.note-hint { font-family: "Bodoni Moda", serif; font-size: 9px; letter-spacing: .2em; text-transform: uppercase; color: var(--gold); margin-top: 6px; }
+
+.reader {
+  position: fixed; inset: 0; z-index: 20; display: grid; place-items: center; padding: 20px;
+  background: rgba(12,8,5,.85); backdrop-filter: blur(6px);
+}
+.reader-card {
+  position: relative; max-width: 640px; max-height: 90svh; overflow: auto; padding: 48px 44px;
+  background: var(--wall); border: 1px solid rgba(214,166,75,.5); box-shadow: 0 30px 60px rgba(0,0,0,.6);
+  font-family: "Cormorant Garamond", serif;
+}
+.reader-card h2 { font-weight: 700; font-size: 38px; line-height: 1.1; }
+.reader-card .medium { font-style: italic; font-size: 21px; color: var(--gold); margin: 6px 0 20px; }
+.reader-card .text { font-size: 21px; line-height: 1.55; text-align: justify; hyphens: auto; }
+.reader-close { position: absolute; top: 10px; right: 16px; background: none; border: 0; font-size: 32px; color: var(--gold); cursor: pointer; }
 
 .room-nav {
   display: flex; justify-content: space-between; align-items: center; gap: 16px; flex-wrap: wrap;
@@ -96,132 +173,24 @@ h2 { font-weight: 700; font-size: clamp(36px, 4.5vw, 52px); line-height: 1.05; }
 .room-nav a:hover { color: var(--cream); }
 .room-nav .back { font-style: italic; color: var(--muted); }
 
-/* Extras */
-.extra { margin-top: 72px; }
-h3 { font-family: "Cormorant Garamond", serif; font-style: italic; font-weight: 500; font-size: 36px; color: var(--gold); margin-bottom: 28px; }
-
-/* 05 Catalogue */
-.catalogue { list-style: none; max-width: 760px; font-family: "Cormorant Garamond", serif; font-size: 21px; }
-.catalogue li { display: flex; align-items: baseline; gap: 12px; padding: 8px 0; }
-.catalogue .obj { font-weight: 700; color: var(--cream); white-space: nowrap; }
-.catalogue .dots { flex: 1; border-bottom: 2px dotted rgba(214,166,75,.5); transform: translateY(-5px); min-width: 24px; }
-.catalogue li > span:last-child { font-style: italic; color: var(--muted); text-align: right; }
-
-/* 06 Chest of drawers */
-.chest {
-  max-width: 560px; padding: 18px; border-radius: 26px 26px 10px 10px;
-  background: linear-gradient(90deg, #5a3218, #8a5228 30%, #a5652f 50%, #8a5228 70%, #5a3218);
-  box-shadow: 0 24px 40px rgba(0,0,0,.5), inset 0 0 0 3px rgba(0,0,0,.25);
-  display: flex; flex-direction: column; gap: 10px;
-}
-.drawer {
-  position: relative; height: 62px; border: 0; cursor: pointer; border-radius: 6px;
-  background: repeating-linear-gradient(90deg, rgba(0,0,0,.06) 0 3px, transparent 3px 11px), linear-gradient(#9b5e2c, #7a4520);
-  box-shadow: inset 0 2px 0 rgba(255,255,255,.15), inset 0 -3px 0 rgba(0,0,0,.3), 0 2px 0 rgba(0,0,0,.35);
-  transition: transform .35s ease;
-}
-.drawer:hover { transform: translateX(6px); }
-.drawer.open { transform: translateX(28px); }
-.knob {
-  position: absolute; left: 50%; top: 50%; width: 22px; height: 22px; border-radius: 50%; transform: translate(-50%, -50%);
-  background: var(--gold-grad); box-shadow: 0 2px 4px rgba(0,0,0,.5);
-  transition: left .35s ease;
-}
-.drawer.open .knob { left: 34px; }
-.tool {
-  position: absolute; inset: 8px 14px 8px 64px; display: flex; align-items: center; gap: 12px;
-  background: var(--paper); color: var(--ink); border-radius: 4px; padding: 0 14px;
-  font-family: "Cormorant Garamond", serif; font-weight: 700; font-size: 20px;
-  opacity: 0; transform: scale(.96); transition: opacity .3s ease, transform .3s ease;
-}
-.tool img { width: 22px; height: 22px; }
-.drawer.open .tool { opacity: 1; transform: none; }
-
-/* 07 Bookshelf */
-.shelf {
-  display: flex; align-items: flex-end; gap: 6px; padding: 24px 20px 0; overflow-x: auto;
-  background: linear-gradient(#2b1a10, #3d2616); border-radius: 6px;
-  box-shadow: inset 0 10px 24px rgba(0,0,0,.6), 0 18px 30px rgba(0,0,0,.45);
-  border-bottom: 16px solid #6b4221;
-}
-.books { display: flex; align-items: flex-end; gap: 4px; }
-.bookend { width: 14px; height: 150px; margin: 0 12px; border-radius: 7px 7px 0 0; background: var(--gold-grad); }
-.book {
-  width: 74px; height: 230px; border: 0; cursor: pointer; flex-shrink: 0;
-  border-radius: 5px 5px 0 0; padding: 0 6px;
-  display: flex; align-items: center; justify-content: center; text-align: center;
-  font-family: "Cormorant Garamond", serif; font-weight: 700; font-size: 12px; line-height: 1.25;
-  letter-spacing: .06em; text-transform: uppercase; color: #f0d58d;
-  box-shadow: inset 0 18px 0 -12px rgba(240,213,141,.55), inset 0 -18px 0 -12px rgba(240,213,141,.55), inset 3px 0 6px rgba(255,255,255,.12), inset -4px 0 8px rgba(0,0,0,.3);
-  transition: transform .3s ease;
-}
-.book:nth-child(3n) { height: 250px; }
-.book:nth-child(4n+1) { height: 216px; }
-.book.thin { width: 54px; font-size: 10px; }
-.book:hover { transform: translateY(-10px); }
-.book.out { transform: translateY(-28px); }
-.c1 { background: #a8957c; } .c2 { background: #b56b78; } .c3 { background: #7b2335; }
-.c4 { background: #d9c7a5; color: #6b4a1c; } .c5 { background: #4b3127; } .c6 { background: #c98a8f; }
-.book-open {
-  margin-top: 24px; max-width: 560px; padding: 22px 26px; border-radius: 4px;
-  background: var(--paper); color: var(--ink); font-family: "Cormorant Garamond", serif; font-size: 19px;
-  box-shadow: 0 14px 30px rgba(0,0,0,.4);
-}
-.book-open .kind { font-weight: 700; font-size: 13px; letter-spacing: .2em; text-transform: uppercase; color: var(--burgundy); }
-.book-open h4 { font-size: 30px; line-height: 1.1; margin: 4px 0 8px; }
-.cv-links { display: flex; gap: 14px; flex-wrap: wrap; margin-top: 28px; }
-.gold-btn {
-  font-family: "Cormorant Garamond", serif; font-weight: 700; font-size: 19px;
-  padding: 10px 22px; border-radius: 999px; background: var(--gold-grad); color: var(--wall-dark);
-  box-shadow: 0 6px 14px rgba(0,0,0,.35);
-}
-.gold-btn.ghost { background: none; color: var(--gold); box-shadow: inset 0 0 0 1px var(--gold); }
-.gold-btn:hover { filter: brightness(1.1); }
-
-/* 08 Letter */
-.letter {
-  max-width: 620px; padding: 40px 40px 32px; border-radius: 3px;
-  background: var(--paper); color: var(--ink); font-family: "Cormorant Garamond", serif;
-  box-shadow: 0 24px 50px rgba(0,0,0,.5);
-  display: flex; flex-direction: column; gap: 18px;
-}
-.salutation { font-family: "Pinyon Script", cursive; font-size: 34px; color: var(--burgundy); }
-.letter label { display: flex; flex-direction: column; gap: 2px; font-size: 14px; font-weight: 700; letter-spacing: .12em; text-transform: uppercase; color: #8a7a62; }
-.letter input, .letter textarea {
-  font: italic 500 21px/1.5 "Cormorant Garamond", serif; color: var(--ink);
-  background: transparent; border: 0; border-bottom: 1px solid #c9b994; padding: 6px 0; resize: vertical;
-  text-transform: none; letter-spacing: 0;
-}
-.letter textarea {
-  border: 0; line-height: 32px;
-  background: repeating-linear-gradient(transparent 0 31px, #c9b994 31px 32px);
-}
-.letter input:focus, .letter textarea:focus { outline: none; border-color: var(--burgundy); }
-.hp { display: none; }
-.seal-row { display: flex; align-items: center; gap: 18px; flex-wrap: wrap; margin-top: 8px; }
-.seal {
-  border: 0; cursor: pointer; padding: 12px 26px 12px 56px; position: relative; border-radius: 999px;
-  background: var(--burgundy); color: var(--paper); font-family: "Cormorant Garamond", serif; font-weight: 700; font-size: 19px;
-  box-shadow: 0 6px 14px rgba(123,35,53,.35);
-}
-.seal::before {
-  content: "L"; position: absolute; left: 10px; top: 50%; transform: translateY(-50%);
-  width: 34px; height: 34px; border-radius: 50%; display: grid; place-items: center;
-  background: radial-gradient(circle at 35% 30%, #b8404f, #6a1626); font-family: "Pinyon Script", cursive; font-size: 22px;
-  box-shadow: inset 0 0 0 3px rgba(0,0,0,.15);
-}
-.seal:hover { background: #8f2a3f; }
-.status { font-style: italic; font-size: 18px; color: var(--burgundy); }
-
-footer { padding-top: 24px; padding-bottom: 40px; color: var(--muted); font-size: 14px; font-family: "Cormorant Garamond", serif; letter-spacing: .1em; }
+footer { padding-top: 24px; padding-bottom: 40px; color: var(--muted); font-size: 13px; font-family: "Bodoni Moda", serif; letter-spacing: .1em; }
 
 @media (max-width: 860px) {
+  .splash { flex-direction: column; }
+  .wall-title { left: 37%; }
   .wall { display: grid; grid-template-columns: 1fr 1fr; gap: 36px 16px; align-items: end; }
   .row-break { display: none; }
   .art img { height: calc(var(--h) * .58); max-width: 100%; object-fit: contain; }
   .plaque { font-size: 13px; white-space: normal; text-align: center; }
-  .room-main { grid-template-columns: 1fr; gap: 32px; }
-  .text { font-size: 19px; text-align: left; }
+  .room-main { flex-direction: column; align-items: center; gap: 28px; padding-top: 28px; }
+  .painting { order: -1; }
+  .painting img { height: auto; max-height: 60svh; max-width: 100%; }
+  .note { width: 100%; max-width: 520px; cursor: default; opacity: 1; margin: 0; }
+  .note:hover { transform: none; }
+  .note-title { font-size: 24px; }
+  .note-medium { font-size: 18px; }
+  .note-text { font-size: 18px; line-height: 1.55; text-align: left; }
+  .note-hint { display: none; }
   .extra { margin-top: 48px; }
   .letter { padding: 28px 22px; }
   .catalogue { font-size: 18px; }
@@ -233,122 +202,4 @@ footer { padding-top: 24px; padding-bottom: 40px; color: var(--muted); font-size
 }
 @media (prefers-reduced-motion: reduce) {
   * { transition: none !important; animation: none !important; }
-}
-
-/* ---------- Screen 1: language ---------- */
-body[data-view="splash"] .nav, body[data-view="splash"] footer,
-body[data-view="entrance"] footer { display: none; }
-.splash {
-  position: relative; display: flex; height: calc(100svh - 34px);
-}
-.splash-name {
-  position: absolute; top: 28px; left: 50%; transform: translateX(-50%); z-index: 2;
-  font-family: "Pinyon Script", cursive; font-size: 40px; color: var(--gold); pointer-events: none;
-}
-.half {
-  flex: 1; border: 0; cursor: pointer; background: transparent;
-  display: flex; flex-direction: column; align-items: center; justify-content: center; gap: 10px;
-  transition: flex-grow .5s ease, background .5s ease;
-}
-.half + .half { border-left: 1px solid rgba(214,166,75,.45); background: rgba(0,0,0,.18); }
-.half .big {
-  font-family: "Cormorant Garamond", serif; font-style: italic; font-weight: 500;
-  font-size: clamp(44px, 7vw, 96px); line-height: 1; color: var(--cream);
-  transition: color .4s ease, text-shadow .4s ease;
-}
-.half .small {
-  font-family: "Cormorant Garamond", serif; font-weight: 700; font-size: 14px; letter-spacing: .25em;
-  text-transform: uppercase; color: var(--gold); opacity: .7; transition: opacity .4s ease;
-}
-.half:hover, .half:focus-visible { flex-grow: 1.25; background: radial-gradient(circle at 50% 50%, rgba(214,166,75,.12), transparent 65%); outline: none; }
-.half:hover .big, .half:focus-visible .big { color: var(--gold); text-shadow: 0 0 30px rgba(214,166,75,.35); }
-.half:hover .small, .half:focus-visible .small { opacity: 1; }
-
-/* ---------- Screen 2: the entrance ---------- */
-.entrance { position: relative; height: calc(100svh - 34px - 76px); min-height: 520px; overflow: hidden; }
-.corridor {
-  position: absolute; inset: 0; perspective: 700px; perspective-origin: 50% 42%;
-  overflow: hidden;
-}
-.hall {
-  position: absolute; inset: 0; transform-style: preserve-3d;
-  animation: approach 7s ease-out both;
-}
-.hall.walk { animation: walk .85s ease-in forwards; }
-@keyframes approach { from { transform: translateZ(-260px); } to { transform: translateZ(0); } }
-@keyframes walk { from { transform: translateZ(0); opacity: 1; } to { transform: translateZ(1300px); opacity: 0; } }
-
-.w { position: absolute; backface-visibility: hidden; }
-.left, .right {
-  top: 0; width: 1600px; height: 100%;
-  background:
-    linear-gradient(to bottom, transparent 0 22px, rgba(214,166,75,.55) 22px 26px, transparent 26px),
-    linear-gradient(to top, #121a17 0 12%, transparent 12%),
-    linear-gradient(var(--wall), var(--wall));
-}
-.left { left: 0; transform-origin: left center; transform: rotateY(90deg); }
-.right { right: 0; transform-origin: right center; transform: rotateY(-90deg); }
-.left::after, .right::after { content: ""; position: absolute; inset: 0; pointer-events: none; }
-.left::after { background: linear-gradient(to right, rgba(0,0,0,0), rgba(0,0,0,.7)); }
-.right::after { background: linear-gradient(to left, rgba(0,0,0,0), rgba(0,0,0,.7)); }
-.left img, .right img {
-  position: absolute; top: 34%; height: 30%; width: auto;
-  filter: blur(1.6px) brightness(.85) drop-shadow(0 10px 12px rgba(0,0,0,.5));
-}
-.floor {
-  bottom: 0; left: 0; width: 100%; height: 1600px; transform-origin: bottom center; transform: rotateX(90deg);
-  background:
-    repeating-linear-gradient(90deg, rgba(0,0,0,.25) 0 2px, transparent 2px 120px),
-    linear-gradient(to top, #6b4423, #2a190d);
-}
-.ceiling {
-  top: 0; left: 0; width: 100%; height: 1600px; transform-origin: top center; transform: rotateX(-90deg);
-  background:
-    repeating-linear-gradient(to bottom, transparent 0 240px, rgba(255,236,190,.22) 240px 252px),
-    linear-gradient(#0e1412, #1b2622);
-}
-.back {
-  inset: 0; transform: translateZ(-1600px);
-  background: radial-gradient(ellipse at 50% 45%, #2c3d37, #111816 75%);
-  display: grid; place-items: center;
-}
-.back span {
-  font-family: "Pinyon Script", cursive; font-size: 260px; color: var(--gold);
-  text-shadow: 0 0 60px rgba(214,166,75,.35); filter: blur(1px);
-}
-.corridor::after {
-  content: ""; position: absolute; inset: 0; pointer-events: none;
-  background: radial-gradient(ellipse at 50% 45%, transparent 35%, rgba(0,0,0,.55) 100%);
-}
-
-.doors {
-  position: absolute; left: 0; right: 0; bottom: 0; z-index: 2;
-  padding: 80px 20px 36px; text-align: center;
-  background: linear-gradient(to top, rgba(10,14,12,.95) 30%, transparent);
-}
-.welcome { font-family: "Cormorant Garamond", serif; font-style: italic; font-size: 22px; color: var(--cream); margin-bottom: 18px; }
-.door-row { display: flex; justify-content: center; gap: 18px; flex-wrap: wrap; }
-.door {
-  width: 280px; padding: 18px 22px; cursor: pointer; border-radius: 140px 140px 4px 4px;
-  background: rgba(22,31,28,.75); border: 1px solid var(--gold); backdrop-filter: blur(4px);
-  display: flex; flex-direction: column; gap: 4px; align-items: center;
-  transition: background .3s ease, transform .3s ease, box-shadow .3s ease;
-}
-.door .big { font-family: "Cormorant Garamond", serif; font-weight: 700; font-size: 26px; color: var(--gold); }
-.door .small { font-family: "Cormorant Garamond", serif; font-style: italic; font-size: 17px; color: var(--muted); }
-.door:hover, .door:focus-visible { background: rgba(214,166,75,.16); transform: translateY(-4px); box-shadow: 0 0 30px rgba(214,166,75,.25); outline: none; }
-
-.room-nav .gold-btn { color: var(--wall-dark); }
-.room-nav .gold-btn:hover { color: var(--wall-dark); }
-
-@media (max-width: 860px) {
-  .splash { flex-direction: column; }
-  .half + .half { border-left: 0; border-top: 1px solid rgba(214,166,75,.45); }
-  .splash-name { top: auto; bottom: 50%; transform: translate(-50%, 50%); font-size: 30px; background: var(--wall-dark); padding: 0 14px; border-radius: 999px; }
-  .entrance { height: calc(100svh - 34px - 76px); }
-  .corridor { perspective: 420px; }
-  .back span { font-size: 120px; }
-  .door { width: 100%; max-width: 320px; padding: 14px 18px; }
-  .door .big { font-size: 22px; }
-  .welcome { font-size: 19px; }
 }

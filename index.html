@@ -7,12 +7,10 @@
   <meta name="description" content="Leonor's portfolio, as a small art collection.">
   <link rel="preconnect" href="https://fonts.googleapis.com">
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-  <link href="https://fonts.googleapis.com/css2?family=Pinyon+Script&family=Cormorant+Garamond:ital,wght@0,400;0,500;0,700;1,400;1,500;1,700&family=DM+Sans:wght@400;500;700&display=swap" rel="stylesheet">
+  <link href="https://fonts.googleapis.com/css2?family=Pinyon+Script&family=Bodoni+Moda:ital,opsz,wght@0,6..96,400;1,6..96,400&family=Cormorant+Garamond:ital,wght@0,400;0,500;0,700;1,400;1,500;1,700&family=DM+Sans:wght@400;500;700&display=swap" rel="stylesheet">
   <link rel="stylesheet" href="style.css">
 </head>
 <body>
-  <div class="molding" aria-hidden="true"></div>
-
   <header class="nav">
     <a href="#gallery" class="logo">Leonor</a>
     <div class="lang" role="group" aria-label="Language">
@@ -23,27 +21,23 @@
 
   <!-- Screen 1: choose a language -->
   <section class="splash" id="splash" hidden>
-    <p class="splash-name">Leonor</p>
-    <button class="half" data-pick="en"><span class="big">English</span><span class="small">Enter the gallery</span></button>
-    <button class="half" data-pick="pt"><span class="big">Português</span><span class="small">Entrar na galeria</span></button>
+    <button class="half en" data-pick="en"><span>english</span></button>
+    <button class="half pt" data-pick="pt"><span>português</span></button>
   </section>
 
-  <!-- Screen 2: the entrance — the gallery seen from the door -->
+  <!-- Screen 2: the entrance — looking into the gallery from the door -->
   <section class="entrance" id="entrance" hidden>
-    <div class="corridor" aria-hidden="true">
-      <div class="hall" id="hall">
-        <div class="w left" id="wall-left"></div>
-        <div class="w right" id="wall-right"></div>
-        <div class="w floor"></div>
-        <div class="w ceiling"></div>
-        <div class="w back"><span>Leonor</span></div>
+    <div class="stage" id="stage">
+      <img src="img/entrance.webp" alt="">
+      <div class="wall-title">
+        <p class="sig">Leonor.</p>
+        <blockquote data-i18n="e.quote">It is a truth universally acknowledged, that a young professional in possession of a portfolio must be in want of someone to see it.</blockquote>
+        <p class="cite" data-i18n="e.cite">— The curators</p>
       </div>
-    </div>
-    <div class="doors">
-      <p class="welcome" data-i18n="e.welcome">Welcome. How would you like to visit?</p>
-      <div class="door-row">
-        <button class="door" data-mode="guided"><span class="big" data-i18n="e.guided">Guided tour</span><span class="small" data-i18n="e.guidedSub">The eight works, in order</span></button>
-        <button class="door" data-mode="free"><span class="big" data-i18n="e.free">Wander freely</span><span class="small" data-i18n="e.freeSub">The whole collection, at your own pace</span></button>
+      <div class="choices">
+        <button data-mode="guided"><span class="big" data-i18n="e.guided">Guided tour</span><span class="small" data-i18n="e.guidedSub">The eight works, in order</span></button>
+        <span class="sep" aria-hidden="true"></span>
+        <button data-mode="free"><span class="big" data-i18n="e.free">Wander freely</span><span class="small" data-i18n="e.freeSub">At your own pace</span></button>
       </div>
     </div>
   </section>
@@ -64,14 +58,15 @@
 
     <!-- One room, filled in by app.js -->
     <article class="room" id="room" hidden>
+      <p class="room-label"><span data-i18n="room.label">Room</span> <span id="room-num"></span></p>
       <div class="room-main">
+        <button class="note" id="note" type="button">
+          <span class="note-title" id="note-title"></span>
+          <span class="note-medium" id="note-medium"></span>
+          <span class="note-text" id="note-text"></span>
+          <span class="note-hint" data-i18n="room.read">Click to read</span>
+        </button>
         <figure class="painting"><img id="room-img" alt=""></figure>
-        <div class="wall-text">
-          <p class="room-label"><span data-i18n="room.label">Room</span> <span id="room-num"></span></p>
-          <h2 id="room-title"></h2>
-          <p class="medium" id="room-medium"></p>
-          <p class="text" id="room-text"></p>
-        </div>
       </div>
       <div id="room-extra"></div>
       <nav class="room-nav">
@@ -83,6 +78,16 @@
   </main>
 
   <footer>© 2026 Leonor</footer>
+
+  <!-- The wall label, enlarged -->
+  <div class="reader" id="reader" hidden>
+    <div class="reader-card" role="dialog" aria-modal="true" aria-labelledby="reader-title">
+      <button class="reader-close" id="reader-close" type="button" aria-label="Close">×</button>
+      <h2 id="reader-title"></h2>
+      <p class="medium" id="reader-medium"></p>
+      <p class="text" id="reader-text"></p>
+    </div>
+  </div>
 
   <!-- ===== Extra content per room ===== -->
 
