@@ -11,6 +11,7 @@
   <link rel="stylesheet" href="style.css">
 </head>
 <body>
+  <div class="wall-bg" id="wall-bg" aria-hidden="true"></div>
   <header class="nav">
     <a href="#gallery" class="overview-link" data-i18n="nav.overview">Overview</a>
     <div class="lang" role="group" aria-label="Language">
@@ -54,18 +55,10 @@
     <button type="button" data-open="contact"><svg viewBox="0 0 24 24" aria-hidden="true"><path d="M3 6h18v12H3z M3 6l9 7 9-7"/></svg><span data-i18n="desk.contact">Write to Leonor</span></button>
   </aside>
 
-  <!-- Pop-up panel: audio guide, flyer or contact -->
+  <!-- Pop-up panel: flyer or contact -->
   <div class="panel" id="panel" hidden>
     <div class="panel-card" id="panel-card" role="dialog" aria-modal="true">
       <button class="panel-close" id="panel-close" type="button" aria-label="Close">×</button>
-
-      <div class="panel-body" data-panel="guide">
-        <div id="guide-labels"></div>
-        <div class="audio">
-          <svg viewBox="0 0 24 24" aria-hidden="true"><path d="M4 15v-3a8 8 0 0116 0v3 M4 15h3v5H4z M17 15h3v5h-3z"/></svg>
-          <p data-i18n="guide.soon">The audio guide is being recorded. More about this work very soon.</p>
-        </div>
-      </div>
 
       <div class="panel-body" data-panel="flyer">
         <p class="sig">Leonor.</p>

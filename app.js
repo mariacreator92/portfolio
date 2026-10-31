@@ -82,8 +82,9 @@ const ui = {
     "e.enter": "Enter the exhibition",
     "desk.flyer": "The exhibition", "desk.contact": "Write to Leonor",
     "flyer.soon": "The exhibition flyer is still at the printer's. Do come back soon.",
-    "guide.open": "Audio guide and more about this work",
-    "guide.soon": "The audio guide is being recorded. More about this work very soon.",
+    "guide.open": "Audio guide",
+    "guide.soon": "The audio guide is being recorded — coming soon.",
+    "label.read": "Read the label",
     "label.write": "Write her a letter →",
     "prev": "Previous work", "next": "Next work", "end": "Back to the whole collection", "close": "Close",
     "mail.dear": "Dear Leonor,", "mail.name": "Your name", "mail.email": "Your email", "mail.msg": "Your message",
@@ -99,8 +100,9 @@ const ui = {
     "e.enter": "Entrar na exposição",
     "desk.flyer": "A exposição", "desk.contact": "Escrever à Leonor",
     "flyer.soon": "O folheto da exposição ainda está na gráfica. Volta em breve.",
-    "guide.open": "Audioguia e mais sobre esta obra",
-    "guide.soon": "O audioguia está a ser gravado. Em breve, mais sobre esta obra.",
+    "guide.open": "Audioguia",
+    "guide.soon": "O audioguia está a ser gravado — em breve.",
+    "label.read": "Ler a legenda",
     "label.write": "Escreve-lhe uma carta →",
     "prev": "Obra anterior", "next": "Próxima obra", "end": "Voltar à coleção completa", "close": "Fechar",
     "mail.dear": "Querida Leonor,", "mail.name": "O teu nome", "mail.email": "O teu email", "mail.msg": "A tua mensagem",
@@ -170,17 +172,64 @@ function buildStrip() {
   $("strip").innerHTML = works.map((w) => `
     <section class="bay" data-slug="${w.slug}" aria-label="${roman[w.n - 1]}. ${w.title[lang]}">
       <img class="frame" src="img/${pad(w.n)}-frame.webp" alt="${w.title[lang]}" style="--s:${size[w.n]}" loading="${w.n <= 2 ? "eager" : "lazy"}">
-      <div class="label" data-guide="${w.slug}">
+      <div class="label" tabindex="0" role="button" aria-label="${t("label.read")}">
         <span class="l-head"><b>${w.title[lang]}.</b> ${w.medium[lang]}<br>${w.year}</span>
         <span class="l-text">${w.text[lang]}</span>
         ${w.slug === "correspondence" ? `<button type="button" class="write" data-open="contact">${t("label.write")}</button>` : ""}
-        <button type="button" class="phones" data-guide="${w.slug}" aria-label="${t("guide.open")}" title="${t("guide.open")}">
+        <button type="button" class="phones" aria-label="${t("guide.open")}" title="${t("guide.open")}">
           <svg viewBox="0 0 24 24" aria-hidden="true"><path d="M4 15v-3a8 8 0 0116 0v3 M4 15h3v5H4z M17 15h3v5h-3z"/></svg>
         </button>
+        <span class="audio-note" role="status">${t("guide.soon")}</span>
       </div>
     </section>`).join("");
   wirePanelOpeners($("strip"));
+  wireLabels();
 }
+
+// ---------- Leaning in to read a label ----------
+// The wall (paintings and background) zooms in on the label instead of opening a window
+let zoomed = null;
+
+function zoomIn(label) {
+  if (matchMedia("(max-width: 860px)").matches) return; // already at reading size on phones
+  const r = label.getBoundingClientRect();
+  const s = Math.min((innerWidth * 0.3) / r.width, (innerHeight * 0.82) / r.height);
+  const cx = r.left + r.width / 2, cy = r.top + r.height / 2;
+  const tx = innerWidth * 0.62, ty = innerHeight * 0.5;
+  strip.style.transform = `translate(${tx - s * cx}px, ${ty - s * cy}px) scale(${s})`;
+  // the forest behind moves a little less, for depth
+  const b = 1 + (s - 1) * 0.45;
+  $("wall-bg").style.transform = `translate(${tx - b * cx}px, ${ty - b * cy}px) scale(${b})`;
+  zoomed = label;
+  label.classList.add("read");
+  document.body.classList.add("zoomed");
+}
+function zoomOut() {
+  if (!zoomed) return;
+  strip.style.transform = "";
+  $("wall-bg").style.transform = "";
+  zoomed.classList.remove("read");
+  zoomed.querySelector(".audio-note").classList.remove("show");
+  zoomed = null;
+  document.body.classList.remove("zoomed");
+}
+
+function wireLabels() {
+  strip.querySelectorAll(".label").forEach((label) => {
+    const toggle = () => (zoomed === label ? zoomOut() : (zoomOut(), zoomIn(label)));
+    label.addEventListener("click", (e) => { e.stopPropagation(); toggle(); });
+    label.addEventListener("keydown", (e) => {
+      if (e.target === label && (e.key === "Enter" || e.key === " ")) { e.preventDefault(); toggle(); }
+    });
+    label.querySelector(".phones").addEventListener("click", (e) => {
+      e.stopPropagation();
+      if (zoomed !== label) { zoomOut(); zoomIn(label); }
+      label.querySelector(".audio-note").classList.toggle("show");
+    });
+  });
+}
+// Clicking anywhere else steps back from the wall
+document.addEventListener("click", (e) => { if (zoomed && !e.target.closest(".label")) zoomOut(); });
 
 const strip = $("strip");
 const bays = () => [...strip.children];
@@ -190,6 +239,7 @@ function bayLeft(i) {
   return i * bays()[0].offsetWidth;
 }
 function goTo(i, smooth = true) {
+  zoomOut();
   if (i < 0) return;
   if (i >= works.length) { location.hash = "gallery"; return; }
   strip.scrollTo({ left: bayLeft(i), behavior: smooth && !reduced ? "smooth" : "instant" });
@@ -221,6 +271,7 @@ let wheelLock = 0;
 strip.addEventListener("wheel", (e) => {
   if (Math.abs(e.deltaY) <= Math.abs(e.deltaX)) return;
   e.preventDefault();
+  if (zoomed) return zoomOut();
   if (Date.now() < wheelLock || Math.abs(e.deltaY) < 4) return;
   wheelLock = Date.now() + 650;
   goTo(current + (e.deltaY > 0 ? 1 : -1));
@@ -229,7 +280,7 @@ strip.addEventListener("wheel", (e) => {
 // Drag with the mouse (touch screens swipe natively)
 let drag = null;
 strip.addEventListener("pointerdown", (e) => {
-  if (e.pointerType !== "mouse" || e.button !== 0 || e.target.closest("button")) return;
+  if (zoomed || e.pointerType !== "mouse" || e.button !== 0 || e.target.closest("button, .label")) return;
   drag = { x: e.clientX, left: strip.scrollLeft, moved: false };
 });
 window.addEventListener("pointermove", (e) => {
@@ -250,17 +301,11 @@ window.addEventListener("pointerup", (e) => {
   strip.addEventListener("click", (ev) => { ev.stopPropagation(); ev.preventDefault(); }, { capture: true, once: true });
 });
 
-// ---------- Panels: audio guide, flyer, contact ----------
-function openPanel(kind, slug) {
+// ---------- Panels: flyer, contact ----------
+function openPanel(kind) {
+  zoomOut();
   document.querySelectorAll(".panel-body").forEach((b) => (b.hidden = b.dataset.panel !== kind));
-  if (kind === "guide") {
-    const w = works.find((x) => x.slug === slug);
-    $("guide-labels").innerHTML = `
-      <h2>${w.title[lang]}.</h2>
-      <p class="medium">${w.medium[lang]}, ${w.year}</p>
-      <p class="text">${w.text[lang]}</p>`;
-  }
-  $("panel-card").setAttribute("aria-label", kind === "guide" ? works.find((x) => x.slug === slug).title[lang] : t(kind === "flyer" ? "desk.flyer" : "desk.contact"));
+  $("panel-card").setAttribute("aria-label", t(kind === "flyer" ? "desk.flyer" : "desk.contact"));
   $("panel").hidden = false;
   $("panel-card").scrollTop = 0;
   $("panel-close").focus();
@@ -269,14 +314,13 @@ function closePanel() { $("panel").hidden = true; }
 
 function wirePanelOpeners(root) {
   root.querySelectorAll("[data-open]").forEach((b) => b.addEventListener("click", (e) => { e.stopPropagation(); openPanel(b.dataset.open); }));
-  root.querySelectorAll("[data-guide]").forEach((b) => b.addEventListener("click", (e) => { e.stopPropagation(); openPanel("guide", b.dataset.guide); }));
 }
 wirePanelOpeners($("desk"));
 $("panel-close").addEventListener("click", closePanel);
 $("panel").addEventListener("click", (e) => { if (e.target === $("panel")) closePanel(); });
 
 document.addEventListener("keydown", (e) => {
-  if (e.key === "Escape") return closePanel();
+  if (e.key === "Escape") { zoomOut(); return closePanel(); }
   if (!$("panel").hidden) return;
   const view = document.body.dataset.view;
   if (view === "exhibit" && e.key === "ArrowRight") { e.preventDefault(); goTo(current + 1); }
@@ -314,6 +358,7 @@ function render() {
   $("gallery").hidden = view !== "gallery";
   $("exhibit").hidden = view !== "exhibit";
   closePanel();
+  zoomOut();
   // On phones the composition is wider than the screen: start in the middle of the wall
   if (view === "gallery") { const g = $("gallery"); g.scrollLeft = (g.scrollWidth - g.clientWidth) / 2; }
   if (view === "exhibit") {
