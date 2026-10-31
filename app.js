@@ -117,7 +117,6 @@ const $ = (id) => document.getElementById(id);
 const reduced = matchMedia("(prefers-reduced-motion: reduce)").matches;
 let lang = "en";
 const t = (key) => ui[lang][key] || key;
-const other = () => (lang === "en" ? "pt" : "en");
 
 // ---------- Language ----------
 function translate(root = document) {
@@ -167,19 +166,13 @@ function buildComposition() {
 // How tall each painting hangs in the exhibition (% of screen height)
 const size = { 1: 70, 2: 88, 3: 76, 4: 74, 5: 64, 6: 76, 7: 60, 8: 76 };
 
-const labelBlock = (w, l, cls = "") => `
-  <span class="l-block ${cls}" lang="${l}">
-    <span class="l-head"><b>${w.title[l]}.</b> ${w.medium[l]}<br>${w.year}</span>
-    <span class="l-text">${w.text[l]}</span>
-  </span>`;
-
 function buildStrip() {
   $("strip").innerHTML = works.map((w) => `
     <section class="bay" data-slug="${w.slug}" aria-label="${roman[w.n - 1]}. ${w.title[lang]}">
       <img class="frame" src="img/${pad(w.n)}-frame.webp" alt="${w.title[lang]}" style="--s:${size[w.n]}" loading="${w.n <= 2 ? "eager" : "lazy"}">
       <div class="label" data-guide="${w.slug}">
-        ${labelBlock(w, lang)}
-        ${labelBlock(w, other(), "alt")}
+        <span class="l-head"><b>${w.title[lang]}.</b> ${w.medium[lang]}<br>${w.year}</span>
+        <span class="l-text">${w.text[lang]}</span>
         ${w.slug === "correspondence" ? `<button type="button" class="write" data-open="contact">${t("label.write")}</button>` : ""}
         <button type="button" class="phones" data-guide="${w.slug}" aria-label="${t("guide.open")}" title="${t("guide.open")}">
           <svg viewBox="0 0 24 24" aria-hidden="true"><path d="M4 15v-3a8 8 0 0116 0v3 M4 15h3v5H4z M17 15h3v5h-3z"/></svg>
@@ -262,12 +255,10 @@ function openPanel(kind, slug) {
   document.querySelectorAll(".panel-body").forEach((b) => (b.hidden = b.dataset.panel !== kind));
   if (kind === "guide") {
     const w = works.find((x) => x.slug === slug);
-    $("guide-labels").innerHTML = [lang, other()].map((l, k) => `
-      <div class="guide-block ${k ? "alt" : ""}" lang="${l}">
-        <h2>${w.title[l]}.</h2>
-        <p class="medium">${w.medium[l]}, ${w.year}</p>
-        <p class="text">${w.text[l]}</p>
-      </div>`).join("");
+    $("guide-labels").innerHTML = `
+      <h2>${w.title[lang]}.</h2>
+      <p class="medium">${w.medium[lang]}, ${w.year}</p>
+      <p class="text">${w.text[lang]}</p>`;
   }
   $("panel-card").setAttribute("aria-label", kind === "guide" ? works.find((x) => x.slug === slug).title[lang] : t(kind === "flyer" ? "desk.flyer" : "desk.contact"));
   $("panel").hidden = false;
