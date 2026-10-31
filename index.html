@@ -13,17 +13,25 @@
 <body>
   <div class="wall-bg" id="wall-bg" aria-hidden="true"></div>
   <header class="nav">
-    <a href="#gallery" class="overview-link" data-i18n="nav.overview">Overview</a>
+    <a href="#map" class="overview-link" data-i18n="nav.overview">Floor plan</a>
     <div class="lang" role="group" aria-label="Language">
       <button type="button" data-lang="en">EN</button>
       <button type="button" data-lang="pt">PT</button>
     </div>
   </header>
 
-  <!-- 1. Choose a language -->
+  <!-- 1. The ticket: tear off the stub in your language -->
   <section class="splash" id="splash" hidden>
-    <button class="half en" data-pick="en"><span>english</span></button>
-    <button class="half pt" data-pick="pt"><span>português</span></button>
+    <div class="ticket" id="ticket">
+      <button class="stub en" data-pick="en"><span class="stub-lang">english</span><span class="stub-small">Admit one</span></button>
+      <div class="ticket-main">
+        <p class="t-top">Uma exposição · An exhibition</p>
+        <p class="sig">Leonor.</p>
+        <p class="t-date" id="ticket-date"></p>
+      </div>
+      <button class="stub pt" data-pick="pt"><span class="stub-lang">português</span><span class="stub-small">Admite uma pessoa</span></button>
+    </div>
+    <p class="ticket-hint">Destaca o teu bilhete · Tear off your ticket</p>
   </section>
 
   <!-- 2. Title wall -->
@@ -33,10 +41,17 @@
       <blockquote data-i18n="e.quote">It is a truth universally acknowledged, that a young professional in possession of a portfolio must be in want of someone to see it.</blockquote>
       <p class="cite" data-i18n="e.cite">— The curators</p>
     </div>
-    <a href="#gallery" class="arrow next-arrow" id="enter" aria-label="Enter"><svg viewBox="0 0 24 48" aria-hidden="true"><path d="M4 4l16 20L4 44"/></svg></a>
+    <a href="#map" class="arrow next-arrow" id="enter" aria-label="Enter"><svg viewBox="0 0 24 48" aria-hidden="true"><path d="M4 4l16 20L4 44"/></svg></a>
   </section>
 
-  <!-- 3. The whole collection on one wall -->
+  <!-- 3. Floor plan -->
+  <section class="map-view" id="map" hidden>
+    <p class="room-no" data-i18n="map.title">Floor plan</p>
+    <div class="plan" id="plan"></div>
+    <a href="#gallery" class="all-works" data-i18n="map.all">Or see all the works on one wall →</a>
+  </section>
+
+  <!-- The whole collection on one wall -->
   <section class="overview" id="gallery" hidden>
     <div class="composition" id="composition"></div>
   </section>

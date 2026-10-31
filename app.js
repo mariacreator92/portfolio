@@ -76,7 +76,17 @@ const works = [
 
 const ui = {
   en: {
-    "nav.overview": "← The whole collection",
+    "nav.overview": "← Floor plan",
+
+    "map.title": "Floor plan", "map.here": "You are here", "map.entrance": "Entrance", "map.shop": "Museum shop", "map.exit": "Exit",
+    "map.all": "Or see all the works on one wall →",
+    "room": "Room", "room.1": "The Person", "room.2": "The Craft",
+    "room.1.line": "Four works on where she comes from: family, sport, two homes and a sunset.",
+    "room.2.line": "What she brings to the work: her skills, her tools, her path, and an open invitation.",
+    "shop": "Museum shop", "shop.title": "The Shop",
+    "shop.line": "Before you leave: postcards of her work, the full catalogue and a way to keep in touch.",
+    "shop.card": "Project", "shop.soon": "This postcard is still being printed. A real project will be here soon.",
+    "shop.cv": "Exhibition catalogue (CV)", "shop.flyer": "Take a flyer",
     "e.quote": "It is a truth universally acknowledged, that a young professional in possession of a portfolio must be in want of someone to see it.",
     "e.cite": "— The curators",
     "e.enter": "Enter the exhibition",
@@ -86,7 +96,7 @@ const ui = {
     "guide.soon": "The audio guide is being recorded — coming soon.",
     "label.read": "Read the label",
     "label.write": "Write her a letter →",
-    "prev": "Previous work", "next": "Next work", "end": "Back to the whole collection", "close": "Close",
+    "prev": "Previous work", "next": "Next work", "end": "Back to the floor plan", "close": "Close",
     "mail.dear": "Dear Leonor,", "mail.name": "Your name", "mail.email": "Your email", "mail.msg": "Your message",
     "mail.send": "Seal & send", "mail.sending": "Sending…",
     "mail.ok": "Your letter is on its way. Thank you!",
@@ -94,7 +104,17 @@ const ui = {
     "mail.off": "The post office isn't open yet — this form will work soon.",
   },
   pt: {
-    "nav.overview": "← A coleção completa",
+    "nav.overview": "← Planta do museu",
+
+    "map.title": "Planta do museu", "map.here": "Estás aqui", "map.entrance": "Entrada", "map.shop": "Loja do museu", "map.exit": "Saída",
+    "map.all": "Ou vê todas as obras numa só parede →",
+    "room": "Sala", "room.1": "A Pessoa", "room.2": "O Ofício",
+    "room.1.line": "Quatro obras sobre de onde vem: a família, o desporto, duas casas e um pôr do sol.",
+    "room.2.line": "O que traz para o trabalho: as competências, as ferramentas, o percurso e um convite em aberto.",
+    "shop": "Loja do museu", "shop.title": "A Loja",
+    "shop.line": "Antes de saíres: postais do seu trabalho, o catálogo completo e uma forma de manter o contacto.",
+    "shop.card": "Projeto", "shop.soon": "Este postal ainda está na gráfica. Em breve, um projeto real.",
+    "shop.cv": "Catálogo da exposição (CV)", "shop.flyer": "Levar um folheto",
     "e.quote": "É uma verdade universalmente reconhecida que uma jovem profissional, na posse de um portfólio, há de andar à procura de quem o queira ver.",
     "e.cite": "— A curadoria",
     "e.enter": "Entrar na exposição",
@@ -104,7 +124,7 @@ const ui = {
     "guide.soon": "O audioguia está a ser gravado — em breve.",
     "label.read": "Ler a legenda",
     "label.write": "Escreve-lhe uma carta →",
-    "prev": "Obra anterior", "next": "Próxima obra", "end": "Voltar à coleção completa", "close": "Fechar",
+    "prev": "Obra anterior", "next": "Próxima obra", "end": "Voltar à planta do museu", "close": "Fechar",
     "mail.dear": "Querida Leonor,", "mail.name": "O teu nome", "mail.email": "O teu email", "mail.msg": "A tua mensagem",
     "mail.send": "Selar e enviar", "mail.sending": "A enviar…",
     "mail.ok": "A tua carta já vai a caminho. Obrigada!",
@@ -138,6 +158,7 @@ function setLang(next) {
   try { localStorage.setItem("lang", lang); } catch {}
   translate();
   buildComposition();
+  buildPlan();
   buildStrip();
   render();
 }
@@ -164,12 +185,116 @@ function buildComposition() {
   }).join("");
 }
 
+// ---------- Floor plan: entrance → Room I → Room II → shop → exit ----------
+const phone = matchMedia("(max-width: 860px)");
+const marks = (ns, x0, y, dx) => ns.map((n, k) => `<g class="mark"><rect x="${x0 + k * dx - 14}" y="${y}" width="28" height="5"/><text x="${x0 + k * dx}" y="${y + 24}">${roman[n - 1]}</text></g>`).join("");
+
+function buildPlan() {
+  $("plan").innerHTML = phone.matches ? planTall() : planWide();
+}
+phone.addEventListener("change", buildPlan);
+
+// On phones the museum is drawn as one column: entrance at the bottom, the shop at the top
+function planTall() {
+  return `
+  <svg viewBox="0 0 600 1000" role="img" aria-label="${t("map.title")}">
+    <path class="walls" d="M40 40 H560 V200 M560 260 V940 H340 M260 940 H40 V40
+      M40 240 H260 M340 240 H560 M40 500 H260 M340 500 H560 M40 760 H260 M340 760 H560"/>
+    <a href="#shop" class="area"><rect x="44" y="44" width="512" height="192"/>
+      <text class="area-no" x="300" y="150">${t("map.shop")}</text></a>
+    <a href="#room-2" class="area"><rect x="44" y="244" width="512" height="252"/>
+      <text class="area-no" x="300" y="345">${t("room")} II</text><text class="area-name" x="300" y="410">${t("room.2")}</text>
+      ${marks([5, 6, 7, 8], 180, 262, 80)}</a>
+    <a href="#room-1" class="area"><rect x="44" y="504" width="512" height="252"/>
+      <text class="area-no" x="300" y="605">${t("room")} I</text><text class="area-name" x="300" y="670">${t("room.1")}</text>
+      ${marks([1, 2, 3, 4], 180, 522, 80)}</a>
+    <a href="#intro" class="area lobby"><rect x="44" y="764" width="512" height="172"/>
+      <text class="area-no" x="300" y="840">${t("map.entrance")}</text>
+      <circle class="here" cx="300" cy="900" r="8"/><text class="here-txt" x="282" y="907">${t("map.here")}</text></a>
+    <path class="route" d="M300 985 V915 M300 885 V120 C300 200 420 230 590 230"/>
+    <text class="door-txt" x="300" y="990">${t("map.entrance")}</text><text class="door-txt exit-side" x="548" y="222">${t("map.exit")}</text>
+  </svg>`;
+}
+
+function planWide() {
+  return `
+  <svg viewBox="0 0 1000 600" role="img" aria-label="${t("map.title")}">
+    <!-- outer walls, with the doorways left open -->
+    <path class="walls" d="M60 40 H940 V560 H600 M520 560 H480 M400 560 H60 V40
+      M480 40 V140 M480 220 V330
+      M60 330 H180 M260 330 H480 H520 M520 330 H620 M700 330 H940
+      M500 330 V560"/>
+    <a href="#room-1" class="area"><rect x="64" y="44" width="412" height="282"/>
+      <text class="area-no" x="270" y="150">${t("room")} I</text><text class="area-name" x="270" y="205">${t("room.1")}</text>
+      ${marks([1, 2, 3, 4], 150, 62, 80)}</a>
+    <a href="#room-2" class="area"><rect x="484" y="44" width="452" height="282"/>
+      <text class="area-no" x="710" y="150">${t("room")} II</text><text class="area-name" x="710" y="205">${t("room.2")}</text>
+      ${marks([5, 6, 7, 8], 590, 62, 80)}</a>
+    <a href="#intro" class="area lobby"><rect x="64" y="334" width="432" height="222"/>
+      <text class="area-no" x="280" y="440">${t("map.entrance")}</text>
+      <circle class="here" cx="440" cy="520" r="7"/><text class="here-txt" x="425" y="525">${t("map.here")}</text></a>
+    <a href="#shop" class="area"><rect x="504" y="334" width="432" height="222"/>
+      <text class="area-no" x="720" y="440">${t("map.shop")}</text></a>
+    <!-- the way round -->
+    <path class="route" d="M440 585 V520 M440 500 C 300 470 220 400 220 300 C 220 230 330 180 480 180 C 600 180 660 260 660 330 C 660 420 560 520 560 585"/>
+    <text class="door-txt" x="440" y="595">${t("map.entrance")}</text><text class="door-txt" x="560" y="595">${t("map.exit")}</text>
+  </svg>`;
+}
+
+// The visit, stop by stop: a doorway for each room, the paintings, then the shop
+const rooms = { 1: [1, 2, 3, 4], 2: [5, 6, 7, 8] };
+const stops = [
+  { id: "room-1", kind: "room", room: 1 },
+  ...works.slice(0, 4).map((w) => ({ id: w.slug, kind: "work", w, room: 1 })),
+  { id: "room-2", kind: "room", room: 2 },
+  ...works.slice(4).map((w) => ({ id: w.slug, kind: "work", w, room: 2 })),
+  { id: "shop", kind: "shop" },
+];
+
 // ---------- The exhibition wall ----------
 // How tall each painting hangs in the exhibition (% of screen height)
 const size = { 1: 70, 2: 88, 3: 76, 4: 74, 5: 64, 6: 76, 7: 60, 8: 76 };
 
+const roomBay = (s) => `
+    <section class="bay title-bay" aria-label="${t("room")} ${roman[s.room - 1]}">
+      <div class="doorway">
+        <p class="room-no">${t("room")} ${roman[s.room - 1]}</p>
+        <h2 class="sig">${t("room." + s.room)}</h2>
+        <p class="room-line">${t("room." + s.room + ".line")}</p>
+        <p class="room-works">${rooms[s.room].map((n) => roman[n - 1]).join(" · ")}</p>
+      </div>
+    </section>`;
+
+const shopBay = () => `
+    <section class="bay shop-bay" aria-label="${t("shop")}">
+      <div class="shop">
+        <p class="room-no">${t("shop")}</p>
+        <h2 class="sig">${t("shop.title")}</h2>
+        <p class="room-line">${t("shop.line")}</p>
+        <div class="postcards">${[1, 2, 3, 4].map((k) => `
+          <button type="button" class="postcard" style="--r:${[-4, 2, -1.5, 3.5][k - 1]}deg">
+            <span class="pc-face pc-front"><span class="pc-title">${t("shop.card")} ${k}</span></span>
+            <span class="pc-face pc-back">${t("shop.soon")}</span>
+          </button>`).join("")}
+        </div>
+        <div class="shop-shelf">
+          <a href="#" class="shelf-item">${t("shop.cv")}</a>
+          <button type="button" class="shelf-item" data-open="flyer">${t("shop.flyer")}</button>
+          <a href="#" class="shelf-item">LinkedIn ↗</a>
+          <button type="button" class="shelf-item" data-open="contact">${t("desk.contact")}</button>
+        </div>
+      </div>
+    </section>`;
+
 function buildStrip() {
-  $("strip").innerHTML = works.map((w) => `
+  $("strip").innerHTML = stops.map((s) => s.kind === "room" ? roomBay(s) : s.kind === "shop" ? shopBay() : workBay(s.w)).join("");
+  strip.querySelectorAll(".postcard").forEach((c) => c.addEventListener("click", () => c.classList.toggle("flipped")));
+  wirePanelOpeners($("strip"));
+  wireLabels();
+}
+
+function workBay(w) {
+  return `
     <section class="bay" data-slug="${w.slug}" aria-label="${roman[w.n - 1]}. ${w.title[lang]}">
       <img class="frame" src="img/${pad(w.n)}-frame.webp" alt="${w.title[lang]}" style="--s:${size[w.n]}" loading="${w.n <= 2 ? "eager" : "lazy"}">
       <div class="label" tabindex="0" role="button" aria-label="${t("label.read")}">
@@ -181,9 +306,7 @@ function buildStrip() {
         </button>
         <span class="audio-note" role="status">${t("guide.soon")}</span>
       </div>
-    </section>`).join("");
-  wirePanelOpeners($("strip"));
-  wireLabels();
+    </section>`;
 }
 
 // ---------- Leaning in to read a label ----------
@@ -241,25 +364,27 @@ function bayLeft(i) {
 function goTo(i, smooth = true) {
   zoomOut();
   if (i < 0) return;
-  if (i >= works.length) { location.hash = "gallery"; return; }
+  if (i >= stops.length) { location.hash = "map"; return; }
   strip.scrollTo({ left: bayLeft(i), behavior: smooth && !reduced ? "smooth" : "instant" });
   setCurrent(i);
 }
 function setCurrent(i) {
   current = i;
-  const w = works[i];
-  $("counter").textContent = `${roman[i]} / ${roman[works.length - 1]}`;
+  const s = stops[i];
+  $("counter").textContent = s.kind === "shop" ? t("shop") : s.kind === "room" ? `${t("room")} ${roman[s.room - 1]}` : `${roman[s.room - 1]} · ${roman[s.w.n - 1]}`;
   $("prev").hidden = i === 0;
-  $("next").setAttribute("aria-label", t(i === works.length - 1 ? "end" : "next"));
-  if (location.hash.slice(1) !== w.slug) history.replaceState(null, "", "#" + w.slug);
+  $("next").setAttribute("aria-label", t(i === stops.length - 1 ? "end" : "next"));
+  if (location.hash.slice(1) !== s.id) history.replaceState(null, "", "#" + s.id);
 }
 // Keep the address and counter in step with free scrolling and swiping
 let scrollTimer;
 strip.addEventListener("scroll", () => {
   clearTimeout(scrollTimer);
   scrollTimer = setTimeout(() => {
-    const i = Math.round(strip.scrollLeft / bays()[0].offsetWidth);
-    if (i !== current) setCurrent(Math.min(i, works.length - 1));
+    const w = bays()[0].offsetWidth;
+    if (!w) return; // the wall is hidden
+    const i = Math.round(strip.scrollLeft / w);
+    if (i !== current) setCurrent(Math.min(i, stops.length - 1));
   }, 80);
 });
 
@@ -280,7 +405,7 @@ strip.addEventListener("wheel", (e) => {
 // Drag with the mouse (touch screens swipe natively)
 let drag = null;
 strip.addEventListener("pointerdown", (e) => {
-  if (zoomed || e.pointerType !== "mouse" || e.button !== 0 || e.target.closest("button, .label")) return;
+  if (zoomed || e.pointerType !== "mouse" || e.button !== 0 || e.target.closest("button, a, .label")) return;
   drag = { x: e.clientX, left: strip.scrollLeft, moved: false };
 });
 window.addEventListener("pointermove", (e) => {
@@ -325,7 +450,7 @@ document.addEventListener("keydown", (e) => {
   const view = document.body.dataset.view;
   if (view === "exhibit" && e.key === "ArrowRight") { e.preventDefault(); goTo(current + 1); }
   if (view === "exhibit" && e.key === "ArrowLeft") { e.preventDefault(); goTo(current - 1); }
-  if (view === "intro" && (e.key === "ArrowRight" || e.key === "Enter")) location.hash = "gallery";
+  if (view === "intro" && (e.key === "ArrowRight" || e.key === "Enter")) walkIn();
 });
 
 // Letter (Web3Forms)
@@ -349,13 +474,16 @@ form.addEventListener("submit", async (e) => {
 // ---------- Views ----------
 function render() {
   const hash = location.hash.slice(1);
-  const i = works.findIndex((x) => x.slug === hash);
-  const view = i >= 0 ? "exhibit" : hash === "gallery" ? "gallery" : hash === "intro" || hash === "entrance" ? "intro" : "splash";
+  const i = stops.findIndex((x) => x.id === hash);
+  const view = i >= 0 ? "exhibit" : ["gallery", "map", "intro"].includes(hash) ? hash : hash === "entrance" ? "intro" : "splash";
   const was = document.body.dataset.view;
   document.body.dataset.view = view;
   $("splash").hidden = view !== "splash";
   $("intro").hidden = view !== "intro";
   $("gallery").hidden = view !== "gallery";
+  $("map").hidden = view !== "map";
+  $("intro").classList.remove("walking");
+  $("ticket").classList.remove("torn-en", "torn-pt");
   $("exhibit").hidden = view !== "exhibit";
   closePanel();
   zoomOut();
@@ -370,10 +498,21 @@ function render() {
 window.addEventListener("hashchange", render);
 window.addEventListener("resize", () => { if (document.body.dataset.view === "exhibit") goTo(current, false); });
 
+// ---------- The ticket: tear off a stub to choose the language ----------
+$("ticket-date").textContent = new Date().toLocaleDateString("pt-PT").replaceAll("/", " · ");
+const later = (fn, ms) => (reduced ? fn() : setTimeout(fn, ms));
 document.querySelectorAll("[data-pick]").forEach((b) => b.addEventListener("click", () => {
   setLang(b.dataset.pick);
-  location.hash = "intro";
+  $("ticket").classList.add("torn-" + b.dataset.pick);
+  later(() => { location.hash = "intro"; }, 1100);
 }));
+
+// ---------- The entrance: walk through the hall to the floor plan ----------
+function walkIn() {
+  $("intro").classList.add("walking");
+  later(() => { location.hash = "map"; }, 900);
+}
+$("enter").addEventListener("click", (e) => { e.preventDefault(); walkIn(); });
 
 // ---------- Start ----------
 let saved = null;
