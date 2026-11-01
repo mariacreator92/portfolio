@@ -49,40 +49,50 @@
     <p class="counter" id="counter"></p>
   </section>
 
-  <!-- Small corner desk: flyer + contact, reachable from anywhere -->
-  <aside class="desk" id="desk">
-    <button type="button" data-open="flyer"><svg viewBox="0 0 24 24" aria-hidden="true"><path d="M6 3h9l3 3v15H6z M15 3v3h3 M9 11h6 M9 14h6 M9 17h4"/></svg><span data-i18n="desk.flyer">The exhibition</span></button>
-    <button type="button" data-open="contact"><svg viewBox="0 0 24 24" aria-hidden="true"><path d="M3 6h18v12H3z M3 6l9 7 9-7"/></svg><span data-i18n="desk.contact">Write to Leonor</span></button>
+  <!-- One button on the side opens everything that isn't a painting -->
+  <button type="button" class="info-tab" id="info-tab" aria-controls="drawer" aria-expanded="false"><span data-i18n="info.open">More information</span></button>
+
+  <div class="drawer-backdrop" id="drawer-backdrop"></div>
+  <aside class="drawer" id="drawer" role="dialog" aria-modal="true" aria-labelledby="drawer-title" inert>
+    <button class="drawer-close" id="drawer-close" type="button" aria-label="Close">×</button>
+    <p class="sig" id="drawer-title">Leonor.</p>
+    <nav class="drawer-nav">
+      <button type="button" data-section="flyer" data-i18n="info.flyer">The exhibition</button>
+      <button type="button" data-section="cv" data-i18n="info.cv">Résumé</button>
+      <button type="button" data-section="contact" data-i18n="info.contact">Contact</button>
+    </nav>
+
+    <section class="drawer-section" id="info-flyer">
+      <h3 data-i18n="info.flyer">The exhibition</h3>
+      <p class="text" data-i18n="flyer.soon">The exhibition flyer is still at the printer's. Do come back soon.</p>
+    </section>
+
+    <section class="drawer-section" id="info-cv">
+      <h3 data-i18n="info.cv">Résumé</h3>
+      <ul class="cv-links">
+        <li><span data-i18n="info.cvpdf">Résumé (PDF)</span> <em data-i18n="info.soon">coming soon</em></li>
+        <li><span>LinkedIn</span> <em data-i18n="info.soon">coming soon</em></li>
+      </ul>
+    </section>
+
+    <section class="drawer-section" id="info-contact">
+      <h3 data-i18n="info.contact">Contact</h3>
+      <form class="letter" id="letter">
+        <!-- Web3Forms: troca pela tua access key (web3forms.com) -->
+        <input type="hidden" name="access_key" value="YOUR_WEB3FORMS_KEY">
+        <input type="hidden" name="subject" value="New letter from the portfolio">
+        <input type="checkbox" name="botcheck" class="hp" tabindex="-1" autocomplete="off">
+        <p class="salutation" data-i18n="mail.dear">Dear Leonor,</p>
+        <label><span data-i18n="mail.name">Your name</span><input name="name" required autocomplete="name"></label>
+        <label><span data-i18n="mail.email">Your email</span><input name="email" type="email" required autocomplete="email"></label>
+        <label><span data-i18n="mail.msg">Your message</span><textarea name="message" rows="5" required></textarea></label>
+        <div class="seal-row">
+          <button type="submit" class="seal" data-i18n="mail.send">Seal & send</button>
+          <p class="status" id="letter-status" role="status"></p>
+        </div>
+      </form>
+    </section>
   </aside>
-
-  <!-- Pop-up panel: flyer or contact -->
-  <div class="panel" id="panel" hidden>
-    <div class="panel-card" id="panel-card" role="dialog" aria-modal="true">
-      <button class="panel-close" id="panel-close" type="button" aria-label="Close">×</button>
-
-      <div class="panel-body" data-panel="flyer">
-        <p class="sig">Leonor.</p>
-        <p class="text" data-i18n="flyer.soon">The exhibition flyer is still at the printer's. Do come back soon.</p>
-      </div>
-
-      <div class="panel-body" data-panel="contact">
-        <form class="letter" id="letter">
-          <!-- Web3Forms: troca pela tua access key (web3forms.com) -->
-          <input type="hidden" name="access_key" value="YOUR_WEB3FORMS_KEY">
-          <input type="hidden" name="subject" value="New letter from the portfolio">
-          <input type="checkbox" name="botcheck" class="hp" tabindex="-1" autocomplete="off">
-          <p class="salutation" data-i18n="mail.dear">Dear Leonor,</p>
-          <label><span data-i18n="mail.name">Your name</span><input name="name" required autocomplete="name"></label>
-          <label><span data-i18n="mail.email">Your email</span><input name="email" type="email" required autocomplete="email"></label>
-          <label><span data-i18n="mail.msg">Your message</span><textarea name="message" rows="5" required></textarea></label>
-          <div class="seal-row">
-            <button type="submit" class="seal" data-i18n="mail.send">Seal & send</button>
-            <p class="status" id="letter-status" role="status"></p>
-          </div>
-        </form>
-      </div>
-    </div>
-  </div>
 
   <script src="app.js"></script>
 </body>

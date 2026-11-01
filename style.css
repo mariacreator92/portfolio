@@ -106,8 +106,8 @@ body[data-view="splash"] .nav { display: none; }
 .strip.dragging img { pointer-events: none; }
 .strip { transform-origin: 0 0; }
 body.zoomed .strip { overflow: hidden; cursor: zoom-out; }
-.nav, .desk, .exhibit .arrow, .counter { transition: opacity .5s ease; }
-body.zoomed :is(.nav, .desk, .exhibit .arrow, .counter) { opacity: 0; pointer-events: none; }
+.nav, .exhibit .arrow, .counter { transition: opacity .5s ease; }
+body.zoomed :is(.nav, .info-tab, .exhibit .arrow, .counter) { opacity: 0; pointer-events: none; }
 
 /* Each bay: the painting, then its label; the next painting peeks in from the right */
 .bay {
@@ -146,28 +146,38 @@ body.zoomed :is(.nav, .desk, .exhibit .arrow, .counter) { opacity: 0; pointer-ev
   font: 15px/1 var(--serif); letter-spacing: .14em; color: var(--muted);
 }
 
-/* ---------- Corner desk ---------- */
-.desk {
-  position: fixed; left: clamp(16px, 2.4vw, 40px); bottom: 5svh; z-index: 6;
-  display: flex; flex-direction: column; gap: 10px; align-items: flex-start;
+/* ---------- "More information": a tab on the side and its drawer ---------- */
+.info-tab {
+  position: fixed; left: 0; top: 50%; z-index: 6; transform: translateY(-50%);
+  writing-mode: vertical-rl; rotate: 180deg; padding: 18px 9px;
+  font: italic 15px/1 var(--serif); letter-spacing: .08em; color: var(--muted);
+  /* the text is rotated half a turn, so its "left" edge is the one against the screen */
+  border: 1px solid rgba(214,166,75,.35); border-right: 0; border-radius: 6px 0 0 6px;
+  background: rgba(29,24,18,.55); backdrop-filter: blur(4px);
+  transition: color .3s, background .3s, opacity .5s;
 }
-body[data-view="splash"] .desk, body[data-view="intro"] .desk { display: none; }
-.desk button { display: flex; align-items: center; gap: 9px; font: italic 15px/1 var(--serif); color: var(--muted); transition: color .3s; }
-.desk button:hover { color: var(--cream); }
-.desk svg { width: 18px; height: 18px; stroke-width: 1.3; }
+.info-tab:hover, .drawer-open .info-tab { color: var(--cream); background: rgba(29,24,18,.85); }
+body[data-view="splash"] .info-tab, body[data-view="intro"] .info-tab { display: none; }
 
-/* ---------- Pop-up panel ---------- */
-.panel {
-  position: fixed; inset: 0; z-index: 20; display: grid; place-items: center; padding: 16px;
-  background: rgba(12,9,6,.82); backdrop-filter: blur(6px);
+.drawer-backdrop { position: fixed; inset: 0; z-index: 19; background: rgba(12,9,6,.6); opacity: 0; pointer-events: none; transition: opacity .5s; }
+.drawer-open .drawer-backdrop { opacity: 1; pointer-events: auto; }
+.drawer {
+  position: fixed; top: 0; left: 0; bottom: 0; z-index: 20; width: min(460px, 92vw); overflow-y: auto;
+  padding: 48px 40px 60px; background: rgba(33,27,20,.98); border-right: 1px solid rgba(214,166,75,.3);
+  box-shadow: 20px 0 60px rgba(0,0,0,.5);
+  transform: translateX(-100%); transition: transform .6s cubic-bezier(.65,0,.25,1);
 }
-.panel-card {
-  position: relative; width: min(680px, 100%); max-height: 90svh; overflow: auto; padding: 52px 48px 44px;
-  background: rgba(36,29,21,.96); border: 1px solid rgba(214,166,75,.35); box-shadow: 0 30px 60px rgba(0,0,0,.6);
-}
-.panel-close { position: absolute; top: 8px; right: 16px; font-size: 32px; line-height: 1; color: var(--gold); }
-.panel .text { font-size: 20px; line-height: 1.55; text-align: justify; hyphens: auto; }
-.panel .sig { font-size: 72px; margin-bottom: 18px; }
+.drawer-open .drawer { transform: none; }
+.drawer-close { position: absolute; top: 10px; right: 16px; font-size: 32px; line-height: 1; color: var(--gold); }
+.drawer .sig { font-size: 64px; }
+.drawer-nav { display: flex; gap: 22px; margin: 14px 0 6px; padding-bottom: 18px; border-bottom: 1px solid rgba(214,166,75,.3); }
+.drawer-nav button { font: italic 16px/1 var(--serif); color: var(--gold); transition: color .3s; }
+.drawer-nav button:hover { color: var(--cream); }
+.drawer-section { padding-top: 30px; scroll-margin-top: 10px; }
+.drawer-section h3 { font: 14px/1 var(--serif); letter-spacing: .3em; text-transform: uppercase; color: var(--muted); margin-bottom: 14px; font-weight: 400; }
+.drawer .text { font-size: 19px; line-height: 1.5; }
+.cv-links { list-style: none; display: grid; gap: 8px; font-size: 19px; }
+.cv-links em { color: var(--muted); font-size: 15px; }
 
 /* The letter */
 .letter { background: var(--paper); color: var(--ink); padding: 34px 34px 28px; display: grid; gap: 14px; box-shadow: 0 10px 30px rgba(0,0,0,.35); }
@@ -209,11 +219,12 @@ body[data-view="splash"] .desk, body[data-view="intro"] .desk { display: none; }
   .audio-note { margin-top: -.6em; }
   .exhibit .arrow { bottom: 3svh; }
   .counter { bottom: calc(3svh + 22px); }
-  .desk { bottom: 3svh; gap: 8px; }
-  .desk span { display: none; }
-  .desk svg { width: 22px; height: 22px; }
-  .panel-card { padding: 46px 22px 28px; }
-  .panel .text { font-size: 18px; text-align: left; }
+  /* on phones the side would cover the label: a small button in the bottom corner instead */
+  .info-tab {
+    writing-mode: horizontal-tb; rotate: none; top: auto; bottom: calc(3svh + 8px); left: 16px; transform: none;
+    padding: 9px 14px; font-size: 14px; border: 1px solid rgba(214,166,75,.35); border-radius: 999px;
+  }
+  .drawer { padding: 44px 22px 50px; }
   .letter { padding: 26px 20px; }
 }
 @media (prefers-reduced-motion: reduce) {

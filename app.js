@@ -80,7 +80,8 @@ const ui = {
     "e.quote": "It is a truth universally acknowledged, that a young professional in possession of a portfolio must be in want of someone to see it.",
     "e.cite": "— The curators",
     "e.enter": "Enter the exhibition",
-    "desk.flyer": "The exhibition", "desk.contact": "Write to Leonor",
+    "info.open": "More information", "info.flyer": "The exhibition", "info.cv": "Résumé", "info.contact": "Contact",
+    "info.cvpdf": "Résumé (PDF)", "info.soon": "coming soon",
     "flyer.soon": "The exhibition flyer is still at the printer's. Do come back soon.",
     "guide.open": "Audio guide",
     "guide.soon": "The audio guide is being recorded — coming soon.",
@@ -98,7 +99,8 @@ const ui = {
     "e.quote": "É uma verdade universalmente reconhecida que uma jovem profissional, na posse de um portfólio, há de andar à procura de quem o queira ver.",
     "e.cite": "— A curadoria",
     "e.enter": "Entrar na exposição",
-    "desk.flyer": "A exposição", "desk.contact": "Escrever à Leonor",
+    "info.open": "Mais informações", "info.flyer": "A exposição", "info.cv": "Currículo", "info.contact": "Contacto",
+    "info.cvpdf": "Currículo (PDF)", "info.soon": "em breve",
     "flyer.soon": "O folheto da exposição ainda está na gráfica. Volta em breve.",
     "guide.open": "Audioguia",
     "guide.soon": "O audioguia está a ser gravado — em breve.",
@@ -113,7 +115,6 @@ const ui = {
   },
 };
 
-const roman = ["I", "II", "III", "IV", "V", "VI", "VII", "VIII"];
 const pad = (n) => String(n).padStart(2, "0");
 const $ = (id) => document.getElementById(id);
 const reduced = matchMedia("(prefers-reduced-motion: reduce)").matches;
@@ -128,7 +129,7 @@ function translate(root = document) {
   });
   $("enter").setAttribute("aria-label", t("e.enter"));
   $("prev").setAttribute("aria-label", t("prev"));
-  $("panel-close").setAttribute("aria-label", t("close"));
+  $("drawer-close").setAttribute("aria-label", t("close"));
 }
 
 function setLang(next) {
@@ -170,7 +171,7 @@ const size = { 1: 70, 2: 88, 3: 76, 4: 74, 5: 64, 6: 76, 7: 60, 8: 76 };
 
 function buildStrip() {
   $("strip").innerHTML = works.map((w) => `
-    <section class="bay" data-slug="${w.slug}" aria-label="${roman[w.n - 1]}. ${w.title[lang]}">
+    <section class="bay" data-slug="${w.slug}" aria-label="${w.n}. ${w.title[lang]}">
       <img class="frame" src="img/${pad(w.n)}-frame.webp" alt="${w.title[lang]}" style="--s:${size[w.n]}" loading="${w.n <= 2 ? "eager" : "lazy"}">
       <div class="label" tabindex="0" role="button" aria-label="${t("label.read")}">
         <span class="l-head"><b>${w.title[lang]}.</b> ${w.medium[lang]}<br>${w.year}</span>
@@ -182,7 +183,7 @@ function buildStrip() {
         <span class="audio-note" role="status">${t("guide.soon")}</span>
       </div>
     </section>`).join("");
-  wirePanelOpeners($("strip"));
+  wireDrawerOpeners($("strip"));
   wireLabels();
 }
 
@@ -248,7 +249,7 @@ function goTo(i, smooth = true) {
 function setCurrent(i) {
   current = i;
   const w = works[i];
-  $("counter").textContent = `${roman[i]} / ${roman[works.length - 1]}`;
+  $("counter").textContent = `${i + 1} / ${works.length}`;
   $("prev").hidden = i === 0;
   $("next").setAttribute("aria-label", t(i === works.length - 1 ? "end" : "next"));
   if (location.hash.slice(1) !== w.slug) history.replaceState(null, "", "#" + w.slug);
@@ -301,27 +302,37 @@ window.addEventListener("pointerup", (e) => {
   strip.addEventListener("click", (ev) => { ev.stopPropagation(); ev.preventDefault(); }, { capture: true, once: true });
 });
 
-// ---------- Panels: flyer, contact ----------
-function openPanel(kind) {
-  zoomOut();
-  document.querySelectorAll(".panel-body").forEach((b) => (b.hidden = b.dataset.panel !== kind));
-  $("panel-card").setAttribute("aria-label", t(kind === "flyer" ? "desk.flyer" : "desk.contact"));
-  $("panel").hidden = false;
-  $("panel-card").scrollTop = 0;
-  $("panel-close").focus();
-}
-function closePanel() { $("panel").hidden = true; }
+// ---------- "More information": a drawer from the side with the flyer, résumé and contact ----------
+const drawer = $("drawer");
+const drawerOpen = () => document.body.classList.contains("drawer-open");
 
-function wirePanelOpeners(root) {
-  root.querySelectorAll("[data-open]").forEach((b) => b.addEventListener("click", (e) => { e.stopPropagation(); openPanel(b.dataset.open); }));
+function openDrawer(section) {
+  zoomOut();
+  document.body.classList.add("drawer-open");
+  drawer.inert = false;
+  $("info-tab").setAttribute("aria-expanded", "true");
+  if (section) $("info-" + section).scrollIntoView({ block: "start", behavior: reduced ? "instant" : "smooth" });
+  else drawer.scrollTop = 0;
+  $("drawer-close").focus({ preventScroll: true });
 }
-wirePanelOpeners($("desk"));
-$("panel-close").addEventListener("click", closePanel);
-$("panel").addEventListener("click", (e) => { if (e.target === $("panel")) closePanel(); });
+function closeDrawer() {
+  if (!drawerOpen()) return;
+  document.body.classList.remove("drawer-open");
+  drawer.inert = true;
+  $("info-tab").setAttribute("aria-expanded", "false");
+}
+
+function wireDrawerOpeners(root) {
+  root.querySelectorAll("[data-open]").forEach((b) => b.addEventListener("click", (e) => { e.stopPropagation(); openDrawer(b.dataset.open); }));
+}
+$("info-tab").addEventListener("click", (e) => { e.stopPropagation(); drawerOpen() ? closeDrawer() : openDrawer(); });
+$("drawer-close").addEventListener("click", closeDrawer);
+$("drawer-backdrop").addEventListener("click", closeDrawer);
+drawer.querySelectorAll("[data-section]").forEach((b) => b.addEventListener("click", () => openDrawer(b.dataset.section)));
 
 document.addEventListener("keydown", (e) => {
-  if (e.key === "Escape") { zoomOut(); return closePanel(); }
-  if (!$("panel").hidden) return;
+  if (e.key === "Escape") { zoomOut(); return closeDrawer(); }
+  if (drawerOpen()) return;
   const view = document.body.dataset.view;
   if (view === "exhibit" && e.key === "ArrowRight") { e.preventDefault(); goTo(current + 1); }
   if (view === "exhibit" && e.key === "ArrowLeft") { e.preventDefault(); goTo(current - 1); }
@@ -357,7 +368,7 @@ function render() {
   $("intro").hidden = view !== "intro";
   $("gallery").hidden = view !== "gallery";
   $("exhibit").hidden = view !== "exhibit";
-  closePanel();
+  closeDrawer();
   zoomOut();
   // On phones the composition is wider than the screen: start in the middle of the wall
   if (view === "gallery") { const g = $("gallery"); g.scrollLeft = (g.scrollWidth - g.clientWidth) / 2; }
