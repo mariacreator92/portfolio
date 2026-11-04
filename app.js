@@ -174,6 +174,7 @@ const lastStop = works.length + 1;
 let current = 0;
 
 function buildPath() {
+  measured = null;
   $("path").innerHTML = works.map((w) => `
     <section class="stop work" data-slug="${w.slug}" aria-label="${w.n}. ${w.title[lang]}">
       <img class="frame" src="img/${pad(w.n)}-frame.webp" srcset="img/${pad(w.n)}-frame.webp 1300w, img/${pad(w.n)}-frame-xl.webp 2000w" sizes="(max-width: 860px) 90vw, 58vw"
@@ -198,48 +199,30 @@ function buildPath() {
   }));
 }
 
-// ---------- The wall changes along the way ----------
-// Leonor's six backgrounds, then which one stands behind each stop: opening text, paintings 1–8, the collection
-const walls = ["wall.webp", "wall-5.webp", "wall-4.webp", "wall-2.webp", "lang-en.webp", "wall-1.webp"];
-const wallAt = [0, 1, 2, 3, 4, 5, 5, 2, 0, 0];
-
-$("wall-bg").innerHTML = walls.map(() => "<span></span>").join("");
-const wallLayers = [...$("wall-bg").children];
-wallLayers[0].style.backgroundImage = `url(img/${walls[0]})`;
-// the others are not needed for the first screen, so they load afterwards
-window.addEventListener("load", () => wallLayers.forEach((l, i) => { l.style.backgroundImage = `url(img/${walls[i]})`; }));
-
-// The fade follows the walk: it happens between two paintings and rests while you stand in front of one
-function fadeWalls(f) {
-  const from = wallAt[Math.floor(f)], to = wallAt[Math.min(lastStop, Math.floor(f) + 1)];
-  const t = Math.max(0, Math.min(1, (f - Math.floor(f) - 0.2) / 0.6));
-  const mix = t * t * (3 - 2 * t);
-  wallLayers.forEach((l, i) => {
-    l.style.zIndex = i === to ? 1 : 0;
-    l.style.opacity = i === to ? (from === to ? 1 : mix) : i === from ? 1 : 0;
-  });
-}
-
 // ---------- Walking: the wheel moves you along the wall, easing to a stop ----------
 const touch = matchMedia("(hover: none)"); // phones swipe natively and snap from CSS
 const maxLeft = () => walk.scrollWidth - walk.clientWidth;
 const clampLeft = (x) => Math.max(0, Math.min(maxLeft(), x));
 // where the wall has to be for a stop to stand in the middle of the screen
-const leftOf = (s) => (s === 0 ? 0 : clampLeft(stops()[s].offsetLeft + stops()[s].offsetWidth / 2 - walk.clientWidth / 2));
+const leftOf = (s) => (s === 0 ? 0 : clampLeft(centres()[s] - walk.clientWidth / 2));
 
 let pos = 0, target = 0, gliding = false, settleTimer;
 let heading = 1; // which way you were walking
 
+// The middle of each stop, measured once and again only when the layout changes
+let measured = null;
+const centres = () => (measured ||= stops().map((s) => s.offsetLeft + s.offsetWidth / 2));
+
 // A point on the wall as a position between stops: 0 is the opening text, 1–8 the paintings, 9 the collection
 function stopAt(x) {
-  const c = stops().map((s) => s.offsetLeft + s.offsetWidth / 2);
+  const c = centres();
   let at = 0;
   while (at < lastStop && c[at + 1] <= x) at++;
   return at === lastStop ? lastStop : Math.max(0, at + (x - c[at]) / (c[at + 1] - c[at]));
 }
 
 function stepGlide() {
-  pos += (target - pos) * 0.11;
+  pos += (target - pos) * 0.17;
   if (Math.abs(target - pos) < 0.5) { pos = target; gliding = false; }
   walk.scrollLeft = pos;
   if (gliding) requestAnimationFrame(stepGlide);
@@ -277,9 +260,9 @@ walk.addEventListener("wheel", (e) => {
   if (zoomed) return zoomOut();
   const d = Math.abs(e.deltaX) > Math.abs(e.deltaY) ? e.deltaX : e.deltaY;
   if (d) heading = Math.sign(d);
-  glide(target + d * (e.deltaMode === 1 ? 30 : 1) * 1.5);
+  glide(target + d * (e.deltaMode === 1 ? 30 : 1) * 2.2);
   clearTimeout(settleTimer);
-  settleTimer = setTimeout(settle, 240);
+  settleTimer = setTimeout(settle, 180);
 }, { passive: false });
 
 // Drag with the mouse (touch screens swipe natively)
@@ -310,6 +293,8 @@ $("prev").addEventListener("click", () => travel(current - 1));
 $("next").addEventListener("click", () => travel(current + 1));
 
 // ---------- Everything that follows the visitor: the light, the forest, the line, the address ----------
+const light = document.querySelector(".room-dim");
+
 function onWalk() {
   if (document.body.dataset.view !== "walk") return;
   const w = walk.clientWidth, x = walk.scrollLeft + w / 2;
@@ -317,14 +302,12 @@ function onWalk() {
 
   const f = stopAt(x);
   current = Math.round(f);
-  fadeWalls(f);
 
   // the spotlight comes up as you arrive in front of a painting
-  const here = stops()[current];
-  const lit = 1 - Math.min(1, Math.abs(x - here.offsetLeft - here.offsetWidth / 2) / (w * 0.32));
-  document.body.style.setProperty("--lit", lit.toFixed(3));
+  const lit = 1 - Math.min(1, Math.abs(x - centres()[current]) / (w * 0.32));
+  light.style.opacity = (0.3 * (1 - lit)).toFixed(3);
   // the forest is further away, so it slides past more slowly
-  document.body.style.setProperty("--along", (walk.scrollLeft / (maxLeft() || 1)).toFixed(4));
+  $("wall-bg").style.translate = `${(-30 * walk.scrollLeft / (maxLeft() || 1)).toFixed(3)}vw 0`;
   document.body.classList.toggle("past-title", walk.scrollLeft > w * 0.3);
   document.body.classList.toggle("at-end", current === lastStop);
 
@@ -435,6 +418,7 @@ function render() {
   document.body.dataset.view = s < 0 ? "splash" : "walk";
   $("splash").hidden = s >= 0;
   walk.hidden = s < 0;
+  measured = null;
   closeSheet();
   zoomOut();
   if (s < 0) return;
@@ -442,7 +426,10 @@ function render() {
   else jump(s);
 }
 window.addEventListener("hashchange", render);
-window.addEventListener("resize", () => { if (document.body.dataset.view === "walk") jump(current); });
+window.addEventListener("resize", () => {
+  measured = null;
+  if (document.body.dataset.view === "walk") jump(current);
+});
 
 document.querySelectorAll("[data-pick]").forEach((b) => b.addEventListener("click", () => {
   setLang(b.dataset.pick);
