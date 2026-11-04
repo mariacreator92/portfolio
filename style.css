@@ -96,42 +96,19 @@ body[data-view="splash"] .nav { display: none; }
 body.zoomed .walk { overflow: hidden; cursor: zoom-out; }
 #path { display: contents; }
 
-/* The floor: boards running towards the visitor, seen in perspective, with a skirting along the wall */
-.floor {
-  position: fixed; left: 0; right: 0; bottom: 0; height: 15svh; z-index: -1; overflow: hidden;
-  perspective: 100svh; perspective-origin: 50% -32svh; background: #1c110a;
-}
-.planks {
-  position: absolute; top: 0; left: -150vw; width: 400vw; height: 60svh; transform-origin: 50% 0;
-  transform: rotateX(90deg) translateX(calc(var(--walked, 0) * -1px));
-  background: repeating-linear-gradient(90deg,
-    #5b3b24 0 98px, #1d1109 98px 100px,
-    #4c3019 100px 198px, #1d1109 198px 200px,
-    #63432a 200px 298px, #1d1109 298px 300px);
-}
-/* the spotlight's pool on the boards, and the shadow where the floor meets the wall */
-.floor::after {
-  content: ""; position: absolute; inset: 0; pointer-events: none;
-  background: radial-gradient(ellipse 34% 120% at 50% 0, rgba(255,205,150,calc(var(--lit, 0) * .3)), transparent 100%),
-    linear-gradient(rgba(6,3,1,.65), rgba(6,3,1,.12) 45%, rgba(6,3,1,.4));
-}
-.floor::before {
-  content: ""; position: absolute; left: 0; right: 0; top: 0; height: 1.5svh; z-index: 1;
-  background: linear-gradient(#3a2819, #1a100a); box-shadow: 0 3px 8px rgba(0,0,0,.7); border-top: 1px solid rgba(214,166,75,.28);
-}
-body[data-view="splash"] :is(.floor, .room-light, .route) { display: none; }
+body[data-view="splash"] :is(.room-light, .route) { display: none; }
 
 /* The room is dim; the light sits where the visitor stands and comes up in front of a painting */
 .room-light {
   position: fixed; inset: 0; z-index: 3; pointer-events: none; transition: opacity .8s ease;
-  background: radial-gradient(ellipse 62vw 74svh at 50% 44%, transparent 58%, rgba(8,5,3,.8) 100%), rgba(8,5,3, calc(.3 - var(--lit, 0) * .3));
+  background: radial-gradient(ellipse 62vw 78svh at 50% 50%, transparent 58%, rgba(8,5,3,.8) 100%), rgba(8,5,3, calc(.3 - var(--lit, 0) * .3));
 }
 body.zoomed .room-light { opacity: 0; }
 /* A quick fade for long trips along the wall */
 .veil { position: fixed; inset: 0; z-index: 8; pointer-events: none; background: #0a0705; opacity: 0; transition: opacity .32s ease; }
 body.cut .veil { opacity: 1; }
 
-.stop { position: relative; flex: none; height: 85svh; }
+.stop { position: relative; flex: none; height: 100svh; }
 .title-stop { width: 80vw; display: grid; place-items: center; padding-left: 10vw; }
 .title img { display: block; width: min(52vw, 100svh * .86); height: auto; }
 .start { position: absolute; right: 6vw; bottom: 6svh; color: var(--cream); opacity: .85; padding: 10px; transition: opacity .3s, translate .3s; }
@@ -144,7 +121,7 @@ body.cut .veil { opacity: 1; }
 /* ---------- The end of the wall: the whole collection ---------- */
 .end-stop { display: grid; place-items: center; padding-inline: 6vw; }
 /* The composition keeps its 16:9 proportions */
-.composition { position: relative; width: min(88vw, calc(86svh * 16 / 9)); aspect-ratio: 16 / 9; }
+.composition { position: relative; width: min(92vw, calc(92svh * 16 / 9)); aspect-ratio: 16 / 9; }
 .piece { position: absolute; display: block; transition: transform .5s ease, filter .5s ease; }
 .piece img { width: 100%; height: auto; display: block; -webkit-user-drag: none; filter: drop-shadow(0 12px 18px rgba(0,0,0,.55)); }
 .piece:hover, .piece:focus-visible { transform: scale(1.035); filter: brightness(1.12); z-index: 1; outline: none; }
@@ -156,11 +133,11 @@ body.zoomed .nav { opacity: 0; pointer-events: none; }
 .work { display: flex; align-items: center; gap: 2.2vw; padding-inline: 7vw; }
 .frame {
   /* one scale for all: the tallest painting fills the wall, the widest still fits the screen */
-  width: calc(var(--w) * min(58vw / 547, 78svh / 507)); aspect-ratio: var(--ar); height: auto; flex: none;
+  width: calc(var(--w) * min(58vw / 547, 86svh / 507)); aspect-ratio: var(--ar); height: auto; flex: none;
   filter: drop-shadow(0 22px 26px rgba(0,0,0,.65)); will-change: transform; user-select: none; -webkit-user-drag: none;
 }
 .label {
-  width: clamp(180px, 11vw, 250px); flex: none; align-self: flex-end; margin-bottom: 14svh;
+  width: clamp(180px, 11vw, 250px); flex: none; align-self: flex-end; margin-bottom: 20svh;
   font: 400 clamp(10px, .62vw, 13px)/1.34 var(--label); color: #e9dfcb; cursor: zoom-in;
   display: flex; flex-direction: column; gap: 1.4em;
 }
@@ -234,7 +211,6 @@ body:not(.past-title) .route, body.zoomed .route { opacity: 0; visibility: hidde
   /* Phones swipe from painting to painting */
   .walk { scroll-snap-type: x mandatory; }
   .stop { scroll-snap-align: center; height: 100svh; }
-  .floor { display: none; }
   .room-light { background: radial-gradient(ellipse 90vw 70svh at 50% 42%, transparent 62%, rgba(8,5,3,.55) 100%); }
   .title-stop { width: 100vw; padding-left: 0; }
   .title img { width: 90vw; }

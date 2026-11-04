@@ -300,8 +300,6 @@ function onWalk() {
   document.body.style.setProperty("--lit", lit.toFixed(3));
   // the forest is further away, so it slides past more slowly
   document.body.style.setProperty("--along", (walk.scrollLeft / (maxLeft() || 1)).toFixed(4));
-  // the floorboards pass at the same speed as the wall
-  document.body.style.setProperty("--walked", (walk.scrollLeft % 300).toFixed(1));
   document.body.classList.toggle("past-title", walk.scrollLeft > w * 0.3);
   document.body.classList.toggle("at-end", current === lastStop);
 
