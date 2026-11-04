@@ -76,16 +76,18 @@ const works = [
 
 const ui = {
   en: {
-    "nav.overview": "← The whole collection",
+    "nav.overview": "← See all the works",
+    "e.guided": "Guided tour", "e.free": "Free visit",
+    "end.line": "End of the exhibition", "end.wall": "See all the works on one wall", "end.write": "Write to Leonor",
     "e.quote": "It is a truth universally acknowledged, that a young professional in possession of a portfolio must be in want of visitors.",
     "e.cite": "— The curators",
     "act.flyer": "Flyer", "act.contact": "Contact",
-    "flyer.soon": "The exhibition flyer is still at the printer's. Do come back soon.",
+    "flyer.soon": "The exhibition flyer is still at the printer's. In the meantime, the works:",
     "guide.open": "Audio guide",
     "guide.soon": "The audio guide is being recorded — coming soon.",
     "label.read": "Read the label",
     "label.write": "Write her a letter →",
-    "prev": "Previous work", "next": "Next work", "end": "Back to the whole collection", "close": "Close",
+    "close": "Close",
     "mail.name": "Your name", "mail.email": "Your email", "mail.msg": "Your message",
     "mail.send": "Seal & send", "mail.sending": "Sending…",
     "mail.ok": "Your letter is on its way. Thank you!",
@@ -93,16 +95,18 @@ const ui = {
     "mail.off": "The post office isn't open yet — this form will work soon.",
   },
   pt: {
-    "nav.overview": "← A coleção completa",
+    "nav.overview": "← Ver todas as obras",
+    "e.guided": "Visita guiada", "e.free": "Visita livre",
+    "end.line": "Fim da exposição", "end.wall": "Ver todas as obras numa parede", "end.write": "Escrever à Leonor",
     "e.quote": "É uma verdade universalmente reconhecida que uma jovem profissional, na posse de um portfólio, há de andar à procura de quem o queira ver.",
     "e.cite": "— A curadoria",
     "act.flyer": "Folheto", "act.contact": "Contacto",
-    "flyer.soon": "O folheto da exposição ainda está na gráfica. Volta em breve.",
+    "flyer.soon": "O folheto da exposição ainda está na gráfica. Entretanto, as obras:",
     "guide.open": "Audioguia",
     "guide.soon": "O audioguia está a ser gravado — em breve.",
     "label.read": "Ler a legenda",
     "label.write": "Escreve-lhe uma carta →",
-    "prev": "Obra anterior", "next": "Próxima obra", "end": "Voltar à coleção completa", "close": "Fechar",
+    "close": "Fechar",
     "mail.name": "O teu nome", "mail.email": "O teu email", "mail.msg": "A tua mensagem",
     "mail.send": "Selar e enviar", "mail.sending": "A enviar…",
     "mail.ok": "A tua carta já vai a caminho. Obrigada!",
@@ -125,7 +129,6 @@ function translate(root = document) {
   });
   $("title-img").src = `img/title-${lang}.webp`;
   $("title-img").alt = `Leonor. ${t("e.quote")} ${t("e.cite")}`;
-  $("prev").setAttribute("aria-label", t("prev"));
   $("sheet-close").setAttribute("aria-label", t("close"));
 }
 
@@ -136,14 +139,10 @@ function setLang(next) {
   try { localStorage.setItem("lang", lang); } catch {}
   translate();
   buildComposition();
-  buildStrip();
+  buildPath();
   render();
 }
 document.querySelectorAll("[data-lang]").forEach((b) => b.addEventListener("click", () => setLang(b.dataset.lang)));
-
-// How far each painting still has to rise when the page is at the title (% of screen height).
-// The top row stays close, so it peeks in at the bottom of the first screen.
-const rise = { 1: 2, 2: 0, 8: 3, 3: 4, 6: 10, 4: 14, 5: 18, 7: 12 };
 
 // ---------- The whole collection, hung as in Leonor's composition (px on a 1920×1080 wall) ----------
 const hang = {
@@ -160,20 +159,34 @@ const hang = {
 function buildComposition() {
   $("composition").innerHTML = works.map((w) => {
     const h = hang[w.n];
-    return `<a href="#${w.slug}" class="piece" style="left:${h.x / 19.2}%;top:${h.y / 10.8}%;width:${h.w / 19.2}%;--rise:${reduced ? 0 : rise[w.n]}">
+    return `<a href="#${w.slug}" class="piece" style="left:${h.x / 19.2}%;top:${h.y / 10.8}%;width:${h.w / 19.2}%">
       <img src="img/${pad(w.n)}-thumb.webp" alt="${w.title[lang]}">
     </a>`;
   }).join("");
 }
 
-// ---------- The exhibition wall ----------
-// How tall each painting hangs in the exhibition (% of screen height)
-const size = { 1: 70, 2: 88, 3: 76, 4: 74, 5: 64, 6: 76, 7: 60, 8: 76 };
+// ---------- The exhibition: one vertical walk ----------
+// How tall each painting hangs (% of screen height) and its proportions, so nothing jumps while images load
+const size = { 1: 84, 2: 90, 3: 86, 4: 84, 5: 80, 6: 86, 7: 76, 8: 86 };
+const ratio = { 1: 1.1109, 2: 0.6599, 3: 0.7293, 4: 0.9648, 5: 1.2827, 6: 0.7633, 7: 1.362, 8: 0.7552 };
 
-function buildStrip() {
-  $("strip").innerHTML = works.map((w) => `
-    <section class="bay" data-slug="${w.slug}" aria-label="${w.n}. ${w.title[lang]}">
-      <img class="frame" src="img/${pad(w.n)}-frame.webp" alt="${w.title[lang]}" style="--s:${size[w.n]}" loading="${w.n <= 2 ? "eager" : "lazy"}">
+const tour = $("tour");
+const stops = () => [...$("path").children];
+const seenStops = new Set([works[0].slug]); // the first painting peeks in under the title
+let current = 0;
+
+// Each painting settles into place the first time it comes into view
+const arrivals = new IntersectionObserver((entries) => entries.forEach((e) => {
+  if (!e.isIntersecting) return;
+  e.target.classList.add("seen");
+  seenStops.add(e.target.dataset.slug);
+}), { root: tour, rootMargin: "0px 0px 20% 0px" }); // starts just before it enters the screen
+
+function buildPath() {
+  $("path").innerHTML = works.map((w) => `
+    <section class="stop${seenStops.has(w.slug) ? " seen" : ""}" data-slug="${w.slug}" aria-label="${w.n}. ${w.title[lang]}">
+      <img class="frame" src="img/${pad(w.n)}-frame.webp" srcset="img/${pad(w.n)}-frame.webp 1300w, img/${pad(w.n)}-frame-xl.webp 2000w" sizes="(max-width: 860px) 90vw, 62vw"
+        alt="${w.title[lang]}" style="--s:${size[w.n]};--ar:${ratio[w.n]}" loading="${w.n <= 2 ? "eager" : "lazy"}">
       <div class="label" tabindex="0" role="button" aria-label="${t("label.read")}">
         <span class="l-head"><b>${w.title[lang]}.</b> ${w.medium[lang]}<br>${w.year}</span>
         <span class="l-text">${w.text[lang]}</span>
@@ -184,9 +197,61 @@ function buildStrip() {
         <span class="audio-note" role="status">${t("guide.soon")}</span>
       </div>
     </section>`).join("");
-  wireSheetOpeners($("strip"));
+  stops().forEach((s) => arrivals.observe(s));
+  wireSheetOpeners($("path"));
   wireLabels();
+
+  $("route-dots").innerHTML = works.map((w, i) => `
+    <li style="top:${(i / (works.length - 1)) * 100}%"><button type="button" data-stop="${i}" aria-label="${w.n}. ${w.title[lang]}">
+      <span class="r-name">${w.title[lang]}</span><span class="r-dot"></span><span class="r-no">${w.n}</span>
+    </button></li>`).join("");
+  $("route-dots").querySelectorAll("[data-stop]").forEach((b) => b.addEventListener("click", () => showStop(+b.dataset.stop, true)));
+
+  $("flyer-list").innerHTML = works.map((w, i) => `<li><button type="button" data-visit="${i}">${w.title[lang]}</button></li>`).join("");
+  $("flyer-list").querySelectorAll("[data-visit]").forEach((b) => b.addEventListener("click", () => {
+    closeSheet();
+    visit(+b.dataset.visit);
+  }));
 }
+
+const centres = () => stops().map((s) => s.offsetTop + s.offsetHeight / 2);
+
+function showStop(i, smooth) {
+  zoomOut();
+  tour.scrollTo({ top: centres()[i] - tour.clientHeight / 2, behavior: smooth && !reduced ? "smooth" : "instant" });
+}
+// From anywhere: walk to a painting, or come back from the wall first
+function visit(i) {
+  if (document.body.dataset.view === "tour") showStop(i, true);
+  else location.hash = works[i].slug;
+}
+
+// ---------- Scrolling: the lights, the top bar and the line all follow the visitor ----------
+function onTourScroll() {
+  if (document.body.dataset.view !== "tour") return; // a late scroll event after leaving for the wall
+  const p = Math.min(1, tour.scrollTop / $("hero").offsetHeight || 0);
+  document.body.style.setProperty("--p", p.toFixed(3));
+  document.body.classList.toggle("past-hero", p > 0.55);
+
+  // where the middle of the screen is along the eight paintings, from 0 to 7
+  const c = centres(), y = tour.scrollTop + tour.clientHeight / 2, last = c.length - 1;
+  let at = 0;
+  while (at < last && c[at + 1] <= y) at++;
+  const f = at === last ? last : Math.max(0, at + (y - c[at]) / (c[at + 1] - c[at]));
+  $("route-fill").style.transform = `scaleY(${f / last})`;
+  current = Math.round(f);
+  $("route-dots").querySelectorAll("li").forEach((li, i) => {
+    li.classList.toggle("here", i === current);
+    li.classList.toggle("done", i < f);
+  });
+
+  // a reload or the back button returns to the same painting
+  const here = p > 0.5 ? works[current].slug : "intro";
+  if (location.hash.slice(1) !== here) history.replaceState(null, "", "#" + here);
+}
+tour.addEventListener("scroll", () => requestAnimationFrame(onTourScroll), { passive: true });
+tour.addEventListener("wheel", () => zoomOut(), { passive: true });
+$("go-guided").addEventListener("click", () => showStop(0, true));
 
 // ---------- Leaning in to read a label ----------
 // The wall (paintings and background) zooms in on the label instead of opening a window
@@ -198,7 +263,7 @@ function zoomIn(label) {
   const s = Math.min((innerWidth * 0.3) / r.width, (innerHeight * 0.82) / r.height);
   const cx = r.left + r.width / 2, cy = r.top + r.height / 2;
   const tx = innerWidth * 0.62, ty = innerHeight * 0.5;
-  strip.style.transform = `translate(${tx - s * cx}px, ${ty - s * cy}px) scale(${s})`;
+  tour.style.transform = `translate(${tx - s * cx}px, ${ty - s * cy}px) scale(${s})`;
   // the forest behind moves a little less, for depth
   const b = 1 + (s - 1) * 0.45;
   $("wall-bg").style.transform = `translate(${tx - b * cx}px, ${ty - b * cy}px) scale(${b})`;
@@ -208,7 +273,7 @@ function zoomIn(label) {
 }
 function zoomOut() {
   if (!zoomed) return;
-  strip.style.transform = "";
+  tour.style.transform = "";
   $("wall-bg").style.transform = "";
   zoomed.classList.remove("read");
   zoomed.querySelector(".audio-note").classList.remove("show");
@@ -217,7 +282,7 @@ function zoomOut() {
 }
 
 function wireLabels() {
-  strip.querySelectorAll(".label").forEach((label) => {
+  tour.querySelectorAll(".label").forEach((label) => {
     const toggle = () => (zoomed === label ? zoomOut() : (zoomOut(), zoomIn(label)));
     label.addEventListener("click", (e) => { e.stopPropagation(); toggle(); });
     label.addEventListener("keydown", (e) => {
@@ -232,76 +297,6 @@ function wireLabels() {
 }
 // Clicking anywhere else steps back from the wall
 document.addEventListener("click", (e) => { if (zoomed && !e.target.closest(".label")) zoomOut(); });
-
-const strip = $("strip");
-const bays = () => [...strip.children];
-let current = 0;
-
-function bayLeft(i) {
-  return i * bays()[0].offsetWidth;
-}
-function goTo(i, smooth = true) {
-  zoomOut();
-  if (i < 0) return;
-  if (i >= works.length) { location.hash = "gallery"; return; }
-  strip.scrollTo({ left: bayLeft(i), behavior: smooth && !reduced ? "smooth" : "instant" });
-  setCurrent(i);
-}
-function setCurrent(i) {
-  current = i;
-  const w = works[i];
-  $("counter").textContent = `${i + 1} / ${works.length}`;
-  $("prev").hidden = i === 0;
-  $("next").setAttribute("aria-label", t(i === works.length - 1 ? "end" : "next"));
-  if (location.hash.slice(1) !== w.slug) history.replaceState(null, "", "#" + w.slug);
-}
-// Keep the address and counter in step with free scrolling and swiping
-let scrollTimer;
-strip.addEventListener("scroll", () => {
-  clearTimeout(scrollTimer);
-  scrollTimer = setTimeout(() => {
-    const i = Math.round(strip.scrollLeft / bays()[0].offsetWidth);
-    if (i !== current) setCurrent(Math.min(i, works.length - 1));
-  }, 80);
-});
-
-$("prev").addEventListener("click", () => goTo(current - 1));
-$("next").addEventListener("click", () => goTo(current + 1));
-
-// A vertical mouse wheel walks along the wall, one painting per gesture
-let wheelLock = 0;
-strip.addEventListener("wheel", (e) => {
-  if (Math.abs(e.deltaY) <= Math.abs(e.deltaX)) return;
-  e.preventDefault();
-  if (zoomed) return zoomOut();
-  if (Date.now() < wheelLock || Math.abs(e.deltaY) < 4) return;
-  wheelLock = Date.now() + 650;
-  goTo(current + (e.deltaY > 0 ? 1 : -1));
-}, { passive: false });
-
-// Drag with the mouse (touch screens swipe natively)
-let drag = null;
-strip.addEventListener("pointerdown", (e) => {
-  if (zoomed || e.pointerType !== "mouse" || e.button !== 0 || e.target.closest("button, .label")) return;
-  drag = { x: e.clientX, left: strip.scrollLeft, moved: false };
-});
-window.addEventListener("pointermove", (e) => {
-  if (!drag) return;
-  const dx = e.clientX - drag.x;
-  if (!drag.moved && Math.abs(dx) > 6) { drag.moved = true; strip.classList.add("dragging"); }
-  if (drag.moved) strip.scrollLeft = drag.left - dx;
-});
-window.addEventListener("pointerup", (e) => {
-  if (!drag) return;
-  const { moved, x } = drag;
-  drag = null;
-  strip.classList.remove("dragging");
-  if (!moved) return;
-  const dx = e.clientX - x;
-  goTo(Math.abs(dx) > 60 ? current + (dx < 0 ? 1 : -1) : current);
-  // swallow the click that ends a drag
-  strip.addEventListener("click", (ev) => { ev.stopPropagation(); ev.preventDefault(); }, { capture: true, once: true });
-});
 
 // ---------- Flyer and letter ----------
 const sheetOpen = () => !$("sheet").hidden;
@@ -319,32 +314,25 @@ function wireSheetOpeners(root) {
   root.querySelectorAll("[data-open]").forEach((b) => b.addEventListener("click", (e) => { e.stopPropagation(); openSheet(b.dataset.open); }));
 }
 wireSheetOpeners(document.querySelector(".actions"));
+wireSheetOpeners(document.querySelector(".end"));
 $("sheet-close").addEventListener("click", closeSheet);
 $("sheet").addEventListener("click", (e) => { if (e.target === $("sheet")) closeSheet(); });
 
-// ---------- The vertical scroll: title above, collection below ----------
-const home = $("home");
-const wallTop = () => $("gallery").offsetTop;
-
-function onHomeScroll() {
-  if (document.body.dataset.view !== "home") return; // a late scroll event after leaving for a painting
-  const p = Math.min(1, home.scrollTop / wallTop() || 0);
-  document.body.style.setProperty("--p", p.toFixed(3));
-  document.body.classList.toggle("past-hero", p > 0.55);
-  // a reload or the back button returns to the same part of the page
-  const here = p > 0.5 ? "gallery" : "intro";
-  if (location.hash.slice(1) !== here) history.replaceState(null, "", "#" + here);
-}
-home.addEventListener("scroll", () => requestAnimationFrame(onHomeScroll), { passive: true });
-
 document.addEventListener("keydown", (e) => {
   if (e.key === "Escape") { zoomOut(); return closeSheet(); }
-  if (sheetOpen()) return;
-  const view = document.body.dataset.view;
-  if (view === "exhibit" && e.key === "ArrowRight") { e.preventDefault(); goTo(current + 1); }
-  if (view === "exhibit" && e.key === "ArrowLeft") { e.preventDefault(); goTo(current - 1); }
-  if (view === "home" && ["ArrowDown", "PageDown", " "].includes(e.key)) { e.preventDefault(); showHome("gallery", true); }
-  if (view === "home" && ["ArrowUp", "PageUp"].includes(e.key)) { e.preventDefault(); showHome("intro", true); }
+  if (sheetOpen() || document.body.dataset.view !== "tour") return;
+  const atTitle = !document.body.classList.contains("past-hero");
+  if (["ArrowDown", "ArrowRight", "PageDown"].includes(e.key)) {
+    e.preventDefault();
+    if (atTitle) showStop(0, true);
+    else if (current < works.length - 1) showStop(current + 1, true);
+    else tour.scrollTo({ top: tour.scrollHeight, behavior: reduced ? "instant" : "smooth" });
+  }
+  if (["ArrowUp", "ArrowLeft", "PageUp"].includes(e.key)) {
+    e.preventDefault();
+    if (current > 0) showStop(current - 1, true);
+    else tour.scrollTo({ top: 0, behavior: reduced ? "instant" : "smooth" });
+  }
 });
 
 // Letter (Web3Forms)
@@ -366,36 +354,30 @@ form.addEventListener("submit", async (e) => {
 });
 
 // ---------- Views ----------
-function showHome(part, smooth) {
-  home.scrollTo({ top: part === "gallery" ? wallTop() : 0, behavior: smooth && !reduced ? "smooth" : "instant" });
-}
-
 function render() {
   const hash = location.hash.slice(1);
   const i = works.findIndex((x) => x.slug === hash);
-  const view = i >= 0 ? "exhibit" : ["intro", "gallery", "entrance"].includes(hash) ? "home" : "splash";
+  const view = i >= 0 || hash === "intro" || hash === "entrance" ? "tour" : hash === "gallery" ? "gallery" : "splash";
   const was = document.body.dataset.view;
   document.body.dataset.view = view;
   $("splash").hidden = view !== "splash";
-  $("home").hidden = view !== "home";
-  $("exhibit").hidden = view !== "exhibit";
+  $("tour").hidden = view !== "tour";
+  $("gallery").hidden = view !== "gallery";
   closeSheet();
   zoomOut();
-  if (view === "home") {
-    showHome(hash === "gallery" ? "gallery" : "intro", was === "home");
+  if (view === "gallery") {
     // On phones the composition is wider than the screen: start in the middle of the wall
     const g = $("gallery");
     g.scrollLeft = (g.scrollWidth - g.clientWidth) / 2;
-    onHomeScroll();
   }
-  if (view === "exhibit") {
-    // Arriving from elsewhere: stand straight in front of the chosen painting
-    if (was !== "exhibit" || i !== current) goTo(i, was === "exhibit");
-    else setCurrent(i);
+  if (view === "tour") {
+    if (i >= 0) showStop(i, was === "tour");
+    else tour.scrollTo({ top: 0, behavior: was === "tour" && !reduced ? "smooth" : "instant" });
+    onTourScroll();
   }
 }
 window.addEventListener("hashchange", render);
-window.addEventListener("resize", () => { if (document.body.dataset.view === "exhibit") goTo(current, false); });
+window.addEventListener("resize", onTourScroll);
 
 document.querySelectorAll("[data-pick]").forEach((b) => b.addEventListener("click", () => {
   setLang(b.dataset.pick);

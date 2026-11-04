@@ -33,22 +33,33 @@
     <button class="half pt" data-pick="pt"><span>português</span></button>
   </section>
 
-  <!-- 2. One vertical scroll: the title, then the whole collection rising from below -->
-  <section class="home" id="home" hidden>
-    <div class="hero">
+  <!-- 2. The title, then the exhibition as one vertical walk -->
+  <section class="tour" id="tour" hidden>
+    <div class="hero" id="hero">
       <h1 class="title"><img id="title-img" src="img/title-en.webp" alt=""></h1>
+      <div class="choices">
+        <button type="button" id="go-guided" data-i18n="e.guided">Guided tour</button>
+        <span aria-hidden="true"></span>
+        <a href="#gallery" data-i18n="e.free">Free visit</a>
+      </div>
     </div>
-    <div class="overview" id="gallery">
-      <div class="composition" id="composition"></div>
+    <div class="path" id="path"></div>
+    <div class="end">
+      <p data-i18n="end.line">End of the exhibition</p>
+      <a href="#gallery" data-i18n="end.wall">See all the works on one wall</a>
+      <button type="button" data-open="contact" data-i18n="end.write">Write to Leonor</button>
     </div>
   </section>
 
-  <!-- 3. The exhibition: one continuous wall -->
-  <section class="exhibit" id="exhibit" hidden>
-    <div class="strip" id="strip"></div>
-    <button type="button" class="arrow prev-arrow" id="prev" aria-label="Previous"><svg viewBox="0 0 24 48" aria-hidden="true"><path d="M20 4L4 24l16 20"/></svg></button>
-    <button type="button" class="arrow next-arrow" id="next" aria-label="Next"><svg viewBox="0 0 24 48" aria-hidden="true"><path d="M4 4l16 20L4 44"/></svg></button>
-    <p class="counter" id="counter"></p>
+  <!-- The line that shows where you are in the exhibition -->
+  <nav class="route" id="route" aria-label="Exhibition">
+    <span class="route-fill" id="route-fill"></span>
+    <ol id="route-dots"></ol>
+  </nav>
+
+  <!-- 3. Free visit: the whole collection on one wall -->
+  <section class="overview" id="gallery" hidden>
+    <div class="composition" id="composition"></div>
   </section>
 
   <!-- Flyer and letter, opened from the top bar -->
@@ -58,7 +69,8 @@
 
       <div class="flyer-paper" data-sheet="flyer">
         <img src="img/leonor.webp" alt="Leonor">
-        <p data-i18n="flyer.soon">The exhibition flyer is still at the printer's. Do come back soon.</p>
+        <p data-i18n="flyer.soon">The exhibition flyer is still at the printer's. In the meantime, the works:</p>
+        <ol class="flyer-list" id="flyer-list"></ol>
       </div>
 
       <form class="letter" id="letter" data-sheet="contact">
