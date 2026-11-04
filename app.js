@@ -76,9 +76,7 @@ const works = [
 
 const ui = {
   en: {
-    "nav.overview": "← See all the works",
-    "e.guided": "Guided tour", "e.free": "Free visit",
-    "end.line": "End of the exhibition", "end.wall": "See all the works on one wall", "end.write": "Write to Leonor",
+    "nav.overview": "See all the works", "start": "Start the visit", "prev": "Previous work", "next": "Next work",
     "e.quote": "It is a truth universally acknowledged, that a young professional in possession of a portfolio must be in want of visitors.",
     "e.cite": "— The curators",
     "act.flyer": "Flyer", "act.contact": "Contact",
@@ -95,9 +93,7 @@ const ui = {
     "mail.off": "The post office isn't open yet — this form will work soon.",
   },
   pt: {
-    "nav.overview": "← Ver todas as obras",
-    "e.guided": "Visita guiada", "e.free": "Visita livre",
-    "end.line": "Fim da exposição", "end.wall": "Ver todas as obras numa parede", "end.write": "Escrever à Leonor",
+    "nav.overview": "Ver todas as obras", "start": "Começar a visita", "prev": "Obra anterior", "next": "Próxima obra",
     "e.quote": "É uma verdade universalmente reconhecida que uma jovem profissional, na posse de um portfólio, há de andar à procura de quem o queira ver.",
     "e.cite": "— A curadoria",
     "act.flyer": "Folheto", "act.contact": "Contacto",
@@ -130,6 +126,9 @@ function translate(root = document) {
   $("title-img").src = `img/title-${lang}.webp`;
   $("title-img").alt = `Leonor. ${t("e.quote")} ${t("e.cite")}`;
   $("sheet-close").setAttribute("aria-label", t("close"));
+  $("start").setAttribute("aria-label", t("start"));
+  $("prev").setAttribute("aria-label", t("prev"));
+  $("next").setAttribute("aria-label", t("next"));
 }
 
 function setLang(next) {
@@ -165,28 +164,21 @@ function buildComposition() {
   }).join("");
 }
 
-// ---------- The exhibition: one vertical walk ----------
+// ---------- The exhibition: one continuous wall ----------
 // How tall each painting hangs (% of screen height) and its proportions, so nothing jumps while images load
-const size = { 1: 84, 2: 90, 3: 86, 4: 84, 5: 80, 6: 86, 7: 76, 8: 86 };
+const size = { 1: 72, 2: 80, 3: 74, 4: 72, 5: 66, 6: 74, 7: 62, 8: 74 };
 const ratio = { 1: 1.1109, 2: 0.6599, 3: 0.7293, 4: 0.9648, 5: 1.2827, 6: 0.7633, 7: 1.362, 8: 0.7552 };
 
-const tour = $("tour");
-const stops = () => [...$("path").children];
-const seenStops = new Set([works[0].slug]); // the first painting peeks in under the title
+const walk = $("walk");
+const stops = () => [...walk.querySelectorAll(".stop")]; // the opening text, the 8 paintings, the whole collection
+const lastStop = works.length + 1;
 let current = 0;
-
-// Each painting settles into place the first time it comes into view
-const arrivals = new IntersectionObserver((entries) => entries.forEach((e) => {
-  if (!e.isIntersecting) return;
-  e.target.classList.add("seen");
-  seenStops.add(e.target.dataset.slug);
-}), { root: tour, rootMargin: "0px 0px 20% 0px" }); // starts just before it enters the screen
 
 function buildPath() {
   $("path").innerHTML = works.map((w) => `
-    <section class="stop${seenStops.has(w.slug) ? " seen" : ""}" data-slug="${w.slug}" aria-label="${w.n}. ${w.title[lang]}">
-      <img class="frame" src="img/${pad(w.n)}-frame.webp" srcset="img/${pad(w.n)}-frame.webp 1300w, img/${pad(w.n)}-frame-xl.webp 2000w" sizes="(max-width: 860px) 90vw, 62vw"
-        alt="${w.title[lang]}" style="--s:${size[w.n]};--ar:${ratio[w.n]}" loading="${w.n <= 2 ? "eager" : "lazy"}">
+    <section class="stop work" data-slug="${w.slug}" aria-label="${w.n}. ${w.title[lang]}">
+      <img class="frame" src="img/${pad(w.n)}-frame.webp" srcset="img/${pad(w.n)}-frame.webp 1300w, img/${pad(w.n)}-frame-xl.webp 2000w" sizes="(max-width: 860px) 90vw, 58vw"
+        alt="${w.title[lang]}" style="--s:${size[w.n]};--ar:${ratio[w.n]}" loading="${w.n <= 2 ? "eager" : "lazy"}" draggable="false">
       <div class="label" tabindex="0" role="button" aria-label="${t("label.read")}">
         <span class="l-head"><b>${w.title[lang]}.</b> ${w.medium[lang]}<br>${w.year}</span>
         <span class="l-text">${w.text[lang]}</span>
@@ -197,61 +189,142 @@ function buildPath() {
         <span class="audio-note" role="status">${t("guide.soon")}</span>
       </div>
     </section>`).join("");
-  stops().forEach((s) => arrivals.observe(s));
   wireSheetOpeners($("path"));
   wireLabels();
 
   $("route-dots").innerHTML = works.map((w, i) => `
-    <li style="top:${(i / (works.length - 1)) * 100}%"><button type="button" data-stop="${i}" aria-label="${w.n}. ${w.title[lang]}">
+    <li style="left:${(i / (works.length - 1)) * 100}%"><button type="button" data-stop="${i + 1}" aria-label="${w.n}. ${w.title[lang]}">
       <span class="r-name">${w.title[lang]}</span><span class="r-dot"></span><span class="r-no">${w.n}</span>
     </button></li>`).join("");
-  $("route-dots").querySelectorAll("[data-stop]").forEach((b) => b.addEventListener("click", () => showStop(+b.dataset.stop, true)));
+  $("route-dots").querySelectorAll("[data-stop]").forEach((b) => b.addEventListener("click", () => travel(+b.dataset.stop)));
 
-  $("flyer-list").innerHTML = works.map((w, i) => `<li><button type="button" data-visit="${i}">${w.title[lang]}</button></li>`).join("");
+  $("flyer-list").innerHTML = works.map((w, i) => `<li><button type="button" data-visit="${i + 1}">${w.title[lang]}</button></li>`).join("");
   $("flyer-list").querySelectorAll("[data-visit]").forEach((b) => b.addEventListener("click", () => {
     closeSheet();
-    visit(+b.dataset.visit);
+    travel(+b.dataset.visit);
   }));
 }
 
-const centres = () => stops().map((s) => s.offsetTop + s.offsetHeight / 2);
+// ---------- Walking: the wheel moves you along the wall, easing to a stop ----------
+const touch = matchMedia("(hover: none)"); // phones swipe natively and snap from CSS
+const maxLeft = () => walk.scrollWidth - walk.clientWidth;
+const clampLeft = (x) => Math.max(0, Math.min(maxLeft(), x));
+// where the wall has to be for a stop to stand in the middle of the screen
+const leftOf = (s) => (s === 0 ? 0 : clampLeft(stops()[s].offsetLeft + stops()[s].offsetWidth / 2 - walk.clientWidth / 2));
 
-function showStop(i, smooth) {
-  zoomOut();
-  tour.scrollTo({ top: centres()[i] - tour.clientHeight / 2, behavior: smooth && !reduced ? "smooth" : "instant" });
-}
-// From anywhere: walk to a painting, or come back from the wall first
-function visit(i) {
-  if (document.body.dataset.view === "tour") showStop(i, true);
-  else location.hash = works[i].slug;
-}
+let pos = 0, target = 0, gliding = false, settleTimer;
+let heading = 1; // which way you were walking
 
-// ---------- Scrolling: the lights, the top bar and the line all follow the visitor ----------
-function onTourScroll() {
-  if (document.body.dataset.view !== "tour") return; // a late scroll event after leaving for the wall
-  const p = Math.min(1, tour.scrollTop / $("hero").offsetHeight || 0);
-  document.body.style.setProperty("--p", p.toFixed(3));
-  document.body.classList.toggle("past-hero", p > 0.55);
-
-  // where the middle of the screen is along the eight paintings, from 0 to 7
-  const c = centres(), y = tour.scrollTop + tour.clientHeight / 2, last = c.length - 1;
+// A point on the wall as a position between stops: 0 is the opening text, 1–8 the paintings, 9 the collection
+function stopAt(x) {
+  const c = stops().map((s) => s.offsetLeft + s.offsetWidth / 2);
   let at = 0;
-  while (at < last && c[at + 1] <= y) at++;
-  const f = at === last ? last : Math.max(0, at + (y - c[at]) / (c[at + 1] - c[at]));
-  $("route-fill").style.transform = `scaleY(${f / last})`;
+  while (at < lastStop && c[at + 1] <= x) at++;
+  return at === lastStop ? lastStop : Math.max(0, at + (x - c[at]) / (c[at + 1] - c[at]));
+}
+
+function stepGlide() {
+  pos += (target - pos) * 0.11;
+  if (Math.abs(target - pos) < 0.5) { pos = target; gliding = false; }
+  walk.scrollLeft = pos;
+  if (gliding) requestAnimationFrame(stepGlide);
+}
+function glide(to) {
+  target = clampLeft(to);
+  if (reduced) { pos = target; walk.scrollLeft = pos; return; }
+  if (touch.matches) { walk.scrollTo({ left: target, behavior: "smooth" }); return; }
+  if (!gliding) { gliding = true; pos = walk.scrollLeft; requestAnimationFrame(stepGlide); }
+}
+function jump(s) {
+  gliding = false;
+  pos = target = leftOf(s);
+  walk.scrollLeft = pos;
+  onWalk();
+}
+// After stopping, the wall centres a painting: the one you were walking towards, unless you barely moved
+function settle() {
+  const wide = stops()[lastStop];
+  if (walk.scrollLeft >= wide.offsetLeft && wide.offsetWidth > walk.clientWidth) return; // the phone pans freely along the last wall
+  const along = stopAt(target + walk.clientWidth / 2), from = Math.floor(along), part = along - from;
+  glide(leftOf(heading > 0 ? (part > 0.15 ? from + 1 : from) : (part < 0.85 ? from : from + 1)));
+}
+// Neighbours are walked to; anything further away is a quick fade, not a long trip
+function travel(s) {
+  zoomOut();
+  s = Math.max(0, Math.min(lastStop, s));
+  if (Math.abs(s - current) <= 2 || reduced) return glide(leftOf(s));
+  document.body.classList.add("cut");
+  setTimeout(() => { jump(s); document.body.classList.remove("cut"); }, 340);
+}
+
+walk.addEventListener("wheel", (e) => {
+  e.preventDefault();
+  if (zoomed) return zoomOut();
+  const d = Math.abs(e.deltaX) > Math.abs(e.deltaY) ? e.deltaX : e.deltaY;
+  if (d) heading = Math.sign(d);
+  glide(target + d * (e.deltaMode === 1 ? 30 : 1) * 1.5);
+  clearTimeout(settleTimer);
+  settleTimer = setTimeout(settle, 240);
+}, { passive: false });
+
+// Drag with the mouse (touch screens swipe natively)
+let drag = null;
+walk.addEventListener("pointerdown", (e) => {
+  if (zoomed || e.pointerType !== "mouse" || e.button !== 0 || e.target.closest("button, .label")) return;
+  gliding = false;
+  drag = { x: e.clientX, left: walk.scrollLeft, moved: false };
+});
+window.addEventListener("pointermove", (e) => {
+  if (!drag) return;
+  const dx = e.clientX - drag.x;
+  if (!drag.moved && Math.abs(dx) > 6) { drag.moved = true; walk.classList.add("dragging"); }
+  if (drag.moved) { heading = dx < 0 ? 1 : -1; pos = target = walk.scrollLeft = clampLeft(drag.left - dx); }
+});
+window.addEventListener("pointerup", () => {
+  if (!drag) return;
+  const { moved } = drag;
+  drag = null;
+  walk.classList.remove("dragging");
+  if (!moved) return;
+  settleTimer = setTimeout(settle, 60);
+  // swallow the click that ends a drag
+  walk.addEventListener("click", (ev) => { ev.stopPropagation(); ev.preventDefault(); }, { capture: true, once: true });
+});
+
+$("start").addEventListener("click", () => travel(1));
+$("prev").addEventListener("click", () => travel(current - 1));
+$("next").addEventListener("click", () => travel(current + 1));
+
+// ---------- Everything that follows the visitor: the light, the forest, the line, the address ----------
+function onWalk() {
+  if (document.body.dataset.view !== "walk") return;
+  const w = walk.clientWidth, x = walk.scrollLeft + w / 2;
+  if (!gliding && !drag) pos = target = walk.scrollLeft; // a swipe moved the wall
+
+  const f = stopAt(x);
   current = Math.round(f);
+
+  // the spotlight comes up as you arrive in front of a painting
+  const here = stops()[current];
+  const lit = 1 - Math.min(1, Math.abs(x - here.offsetLeft - here.offsetWidth / 2) / (w * 0.32));
+  document.body.style.setProperty("--lit", lit.toFixed(3));
+  // the forest is further away, so it slides past more slowly
+  document.body.style.setProperty("--along", (walk.scrollLeft / (maxLeft() || 1)).toFixed(4));
+  document.body.classList.toggle("past-title", walk.scrollLeft > w * 0.3);
+  document.body.classList.toggle("at-end", current === lastStop);
+
+  const n = works.length;
+  $("route-fill").style.transform = `scaleX(${Math.max(0, Math.min(1, (f - 1) / (n - 1)))})`;
   $("route-dots").querySelectorAll("li").forEach((li, i) => {
-    li.classList.toggle("here", i === current);
-    li.classList.toggle("done", i < f);
+    li.classList.toggle("here", i + 1 === current);
+    li.classList.toggle("done", i + 1 <= f);
   });
 
-  // a reload or the back button returns to the same painting
-  const here = p > 0.5 ? works[current].slug : "intro";
-  if (location.hash.slice(1) !== here) history.replaceState(null, "", "#" + here);
+  // a reload or the back button returns to the same place on the wall
+  const place = current === 0 ? "intro" : current === lastStop ? "gallery" : works[current - 1].slug;
+  if (location.hash.slice(1) !== place) history.replaceState(null, "", "#" + place);
 }
-tour.addEventListener("scroll", () => requestAnimationFrame(onTourScroll), { passive: true });
-tour.addEventListener("wheel", () => zoomOut(), { passive: true });
-$("go-guided").addEventListener("click", () => showStop(0, true));
+walk.addEventListener("scroll", () => requestAnimationFrame(onWalk), { passive: true });
 
 // ---------- Leaning in to read a label ----------
 // The wall (paintings and background) zooms in on the label instead of opening a window
@@ -263,7 +336,7 @@ function zoomIn(label) {
   const s = Math.min((innerWidth * 0.3) / r.width, (innerHeight * 0.82) / r.height);
   const cx = r.left + r.width / 2, cy = r.top + r.height / 2;
   const tx = innerWidth * 0.62, ty = innerHeight * 0.5;
-  tour.style.transform = `translate(${tx - s * cx}px, ${ty - s * cy}px) scale(${s})`;
+  walk.style.transform = `translate(${tx - s * cx}px, ${ty - s * cy}px) scale(${s})`;
   // the forest behind moves a little less, for depth
   const b = 1 + (s - 1) * 0.45;
   $("wall-bg").style.transform = `translate(${tx - b * cx}px, ${ty - b * cy}px) scale(${b})`;
@@ -273,7 +346,7 @@ function zoomIn(label) {
 }
 function zoomOut() {
   if (!zoomed) return;
-  tour.style.transform = "";
+  walk.style.transform = "";
   $("wall-bg").style.transform = "";
   zoomed.classList.remove("read");
   zoomed.querySelector(".audio-note").classList.remove("show");
@@ -282,7 +355,7 @@ function zoomOut() {
 }
 
 function wireLabels() {
-  tour.querySelectorAll(".label").forEach((label) => {
+  walk.querySelectorAll(".label").forEach((label) => {
     const toggle = () => (zoomed === label ? zoomOut() : (zoomOut(), zoomIn(label)));
     label.addEventListener("click", (e) => { e.stopPropagation(); toggle(); });
     label.addEventListener("keydown", (e) => {
@@ -314,25 +387,14 @@ function wireSheetOpeners(root) {
   root.querySelectorAll("[data-open]").forEach((b) => b.addEventListener("click", (e) => { e.stopPropagation(); openSheet(b.dataset.open); }));
 }
 wireSheetOpeners(document.querySelector(".actions"));
-wireSheetOpeners(document.querySelector(".end"));
 $("sheet-close").addEventListener("click", closeSheet);
 $("sheet").addEventListener("click", (e) => { if (e.target === $("sheet")) closeSheet(); });
 
 document.addEventListener("keydown", (e) => {
   if (e.key === "Escape") { zoomOut(); return closeSheet(); }
-  if (sheetOpen() || document.body.dataset.view !== "tour") return;
-  const atTitle = !document.body.classList.contains("past-hero");
-  if (["ArrowDown", "ArrowRight", "PageDown"].includes(e.key)) {
-    e.preventDefault();
-    if (atTitle) showStop(0, true);
-    else if (current < works.length - 1) showStop(current + 1, true);
-    else tour.scrollTo({ top: tour.scrollHeight, behavior: reduced ? "instant" : "smooth" });
-  }
-  if (["ArrowUp", "ArrowLeft", "PageUp"].includes(e.key)) {
-    e.preventDefault();
-    if (current > 0) showStop(current - 1, true);
-    else tour.scrollTo({ top: 0, behavior: reduced ? "instant" : "smooth" });
-  }
+  if (sheetOpen() || document.body.dataset.view !== "walk") return;
+  if (["ArrowRight", "ArrowDown", "PageDown"].includes(e.key)) { e.preventDefault(); travel(current + 1); }
+  if (["ArrowLeft", "ArrowUp", "PageUp"].includes(e.key)) { e.preventDefault(); travel(current - 1); }
 });
 
 // Letter (Web3Forms)
@@ -357,27 +419,19 @@ form.addEventListener("submit", async (e) => {
 function render() {
   const hash = location.hash.slice(1);
   const i = works.findIndex((x) => x.slug === hash);
-  const view = i >= 0 || hash === "intro" || hash === "entrance" ? "tour" : hash === "gallery" ? "gallery" : "splash";
+  const s = i >= 0 ? i + 1 : hash === "gallery" ? lastStop : hash === "intro" || hash === "entrance" ? 0 : -1;
   const was = document.body.dataset.view;
-  document.body.dataset.view = view;
-  $("splash").hidden = view !== "splash";
-  $("tour").hidden = view !== "tour";
-  $("gallery").hidden = view !== "gallery";
+  document.body.dataset.view = s < 0 ? "splash" : "walk";
+  $("splash").hidden = s >= 0;
+  walk.hidden = s < 0;
   closeSheet();
   zoomOut();
-  if (view === "gallery") {
-    // On phones the composition is wider than the screen: start in the middle of the wall
-    const g = $("gallery");
-    g.scrollLeft = (g.scrollWidth - g.clientWidth) / 2;
-  }
-  if (view === "tour") {
-    if (i >= 0) showStop(i, was === "tour");
-    else tour.scrollTo({ top: 0, behavior: was === "tour" && !reduced ? "smooth" : "instant" });
-    onTourScroll();
-  }
+  if (s < 0) return;
+  if (was === "walk") travel(s);
+  else jump(s);
 }
 window.addEventListener("hashchange", render);
-window.addEventListener("resize", onTourScroll);
+window.addEventListener("resize", () => { if (document.body.dataset.view === "walk") jump(current); });
 
 document.querySelectorAll("[data-pick]").forEach((b) => b.addEventListener("click", () => {
   setLang(b.dataset.pick);

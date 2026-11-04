@@ -33,34 +33,30 @@
     <button class="half pt" data-pick="pt"><span>português</span></button>
   </section>
 
-  <!-- 2. The title, then the exhibition as one vertical walk -->
-  <section class="tour" id="tour" hidden>
-    <div class="hero" id="hero">
+  <!-- 2. One continuous wall: opening text, the eight paintings, then the whole collection -->
+  <div class="floor" aria-hidden="true"></div>
+  <section class="walk" id="walk" hidden>
+    <div class="stop title-stop">
       <h1 class="title"><img id="title-img" src="img/title-en.webp" alt=""></h1>
-      <div class="choices">
-        <button type="button" id="go-guided" data-i18n="e.guided">Guided tour</button>
-        <span aria-hidden="true"></span>
-        <a href="#gallery" data-i18n="e.free">Free visit</a>
-      </div>
+      <button type="button" class="start" id="start" aria-label="Start"><svg viewBox="0 0 24 48" aria-hidden="true"><path d="M4 4l16 20L4 44"/></svg></button>
     </div>
-    <div class="path" id="path"></div>
-    <div class="end">
-      <p data-i18n="end.line">End of the exhibition</p>
-      <a href="#gallery" data-i18n="end.wall">See all the works on one wall</a>
-      <button type="button" data-open="contact" data-i18n="end.write">Write to Leonor</button>
+    <div id="path"></div>
+    <div class="stop end-stop">
+      <div class="composition" id="composition"></div>
     </div>
   </section>
+  <div class="room-light" aria-hidden="true"></div>
+  <div class="veil" aria-hidden="true"></div>
 
-  <!-- The line that shows where you are in the exhibition -->
+  <!-- The line on the floor: where you are in the exhibition -->
   <nav class="route" id="route" aria-label="Exhibition">
-    <span class="route-fill" id="route-fill"></span>
-    <ol id="route-dots"></ol>
+    <button type="button" class="route-arrow" id="prev" aria-label="Previous"><svg viewBox="0 0 24 48" aria-hidden="true"><path d="M20 4L4 24l16 20"/></svg></button>
+    <div class="route-line">
+      <span class="route-fill" id="route-fill"></span>
+      <ol id="route-dots"></ol>
+    </div>
+    <button type="button" class="route-arrow" id="next" aria-label="Next"><svg viewBox="0 0 24 48" aria-hidden="true"><path d="M4 4l16 20L4 44"/></svg></button>
   </nav>
-
-  <!-- 3. Free visit: the whole collection on one wall -->
-  <section class="overview" id="gallery" hidden>
-    <div class="composition" id="composition"></div>
-  </section>
 
   <!-- Flyer and letter, opened from the top bar -->
   <div class="sheet" id="sheet" hidden>
