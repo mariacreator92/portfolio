@@ -197,6 +197,28 @@ function buildPath() {
   }));
 }
 
+// ---------- The wall changes along the way ----------
+// Leonor's six backgrounds, then which one stands behind each stop: opening text, paintings 1–8, the collection
+const walls = ["wall.webp", "wall-5.webp", "wall-4.webp", "wall-2.webp", "lang-en.webp", "wall-1.webp"];
+const wallAt = [0, 1, 2, 3, 4, 5, 5, 2, 0, 0];
+
+$("wall-bg").innerHTML = walls.map(() => "<span></span>").join("");
+const wallLayers = [...$("wall-bg").children];
+wallLayers[0].style.backgroundImage = `url(img/${walls[0]})`;
+// the others are not needed for the first screen, so they load afterwards
+window.addEventListener("load", () => wallLayers.forEach((l, i) => { l.style.backgroundImage = `url(img/${walls[i]})`; }));
+
+// The fade follows the walk: it happens between two paintings and rests while you stand in front of one
+function fadeWalls(f) {
+  const from = wallAt[Math.floor(f)], to = wallAt[Math.min(lastStop, Math.floor(f) + 1)];
+  const t = Math.max(0, Math.min(1, (f - Math.floor(f) - 0.2) / 0.6));
+  const mix = t * t * (3 - 2 * t);
+  wallLayers.forEach((l, i) => {
+    l.style.zIndex = i === to ? 1 : 0;
+    l.style.opacity = i === to ? (from === to ? 1 : mix) : i === from ? 1 : 0;
+  });
+}
+
 // ---------- Walking: the wheel moves you along the wall, easing to a stop ----------
 const touch = matchMedia("(hover: none)"); // phones swipe natively and snap from CSS
 const maxLeft = () => walk.scrollWidth - walk.clientWidth;
@@ -293,6 +315,7 @@ function onWalk() {
 
   const f = stopAt(x);
   current = Math.round(f);
+  fadeWalls(f);
 
   // the spotlight comes up as you arrive in front of a painting
   const here = stops()[current];
