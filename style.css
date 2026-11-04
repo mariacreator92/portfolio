@@ -97,7 +97,7 @@ body[data-view="splash"] .nav { display: none; }
 body.zoomed .walk { overflow: hidden; cursor: zoom-out; }
 #path { display: contents; }
 
-body[data-view="splash"] :is(.room-light, .route) { display: none; }
+body[data-view="splash"] :is(.room-light, .edge) { display: none; }
 
 /* The room is dim; the light sits where the visitor stands and comes up in front of a painting */
 .room-light {
@@ -112,10 +112,6 @@ body.cut .veil { opacity: 1; }
 .stop { position: relative; flex: none; height: 100svh; }
 .title-stop { width: 80vw; display: grid; place-items: center; padding-left: 10vw; }
 .title img { display: block; width: min(52vw, 100svh * .86); height: auto; }
-.start { position: absolute; right: 6vw; bottom: 6svh; color: var(--cream); opacity: .85; padding: 10px; transition: opacity .3s, translate .3s; }
-.start svg { display: block; stroke-width: 1.4; }
-.start svg { width: 22px; height: 44px; }
-.start:hover { opacity: 1; translate: 4px 0; }
 
 @keyframes fade { from { opacity: 0; } to { opacity: 1; } }
 
@@ -155,13 +151,16 @@ body.zoomed .nav { opacity: 0; pointer-events: none; }
 .audio-note { font-style: italic; text-align: right; opacity: 0; margin-top: -1em; transition: opacity .4s; }
 .audio-note.show { opacity: .85; }
 
-/* ---------- The bar: how far along the exhibition you are ---------- */
-.route {
-  position: fixed; left: 50%; bottom: 3svh; translate: -50% 0; z-index: 6; width: min(340px, 44vw); height: 2px;
-  background: rgba(243,234,215,.22); transition: opacity .5s ease, visibility .5s;
+/* ---------- Two quiet arrows ---------- */
+.edge {
+  position: fixed; top: 50%; translate: 0 -50%; z-index: 6; padding: 18px 14px; color: var(--cream); opacity: .45;
+  filter: drop-shadow(0 0 4px rgba(0,0,0,.9)); transition: opacity .4s ease, visibility .4s;
 }
-body:not(.past-title) .route, body.zoomed .route { opacity: 0; visibility: hidden; }
-.route-fill { position: absolute; inset: 0; background: var(--gold); transform: scaleX(0); transform-origin: left; }
+.edge.prev { left: clamp(6px, 1.4vw, 24px); }
+.edge.next { right: clamp(6px, 1.4vw, 24px); }
+.edge svg { display: block; width: 13px; height: 26px; stroke-width: 1.2; }
+.edge:hover, .edge:focus-visible { opacity: .85; outline: none; }
+body.zoomed .edge { opacity: 0; visibility: hidden; }
 
 /* ---------- Flyer and letter ---------- */
 .sheet {
@@ -215,7 +214,6 @@ body:not(.past-title) .route, body.zoomed .route { opacity: 0; visibility: hidde
   .room-light { background: radial-gradient(ellipse 90vw 70svh at 50% 42%, transparent 62%, rgba(8,5,3,.55) 100%); }
   .title-stop { width: 100vw; padding-left: 0; }
   .title img { width: 90vw; }
-  .start { right: 14px; bottom: 11svh; }
   .work { width: 100vw; flex-direction: column; align-items: center; gap: 16px; padding: 72px 16px 90px; overflow-y: auto; }
   .frame { width: calc(var(--w) * min(88vw / 547, 54svh / 507)); }
   .label { width: 100%; max-width: 460px; margin: 0; align-self: center; font-size: 15px; line-height: 1.45; cursor: default; }
@@ -224,7 +222,8 @@ body:not(.past-title) .route, body.zoomed .route { opacity: 0; visibility: hidde
   .composition { width: calc(78svh * 16 / 9); }
   .phones svg { width: 22px; height: 22px; }
   .audio-note { margin-top: -.6em; }
-  .route { width: 60vw; bottom: 18px; }
+  /* at the foot of the screen, clear of the painting and the text */
+  .edge { top: auto; bottom: calc(14px + env(safe-area-inset-bottom)); translate: none; padding: 10px 14px; }
   .letter { padding: 26px 20px; }
 }
 @media (prefers-reduced-motion: reduce) {

@@ -76,7 +76,7 @@ const works = [
 
 const ui = {
   en: {
-    "nav.overview": "See all the works", "start": "Start the visit",
+    "nav.overview": "See all the works", "prev": "Previous", "next": "Next",
     "e.quote": "It is a truth universally acknowledged, that a young professional in possession of a portfolio must be in want of visitors.",
     "e.cite": "— The curators",
     "act.flyer": "Flyer", "act.contact": "Contact",
@@ -93,7 +93,7 @@ const ui = {
     "mail.off": "The post office isn't open yet — this form will work soon.",
   },
   pt: {
-    "nav.overview": "Ver todas as obras", "start": "Começar a visita",
+    "nav.overview": "Ver todas as obras", "prev": "Anterior", "next": "Seguinte",
     "e.quote": "É uma verdade universalmente reconhecida que uma jovem profissional, na posse de um portfólio, há de andar à procura de quem o queira ver.",
     "e.cite": "— A curadoria",
     "act.flyer": "Folheto", "act.contact": "Contacto",
@@ -126,7 +126,8 @@ function translate(root = document) {
   $("title-img").src = `img/title-${lang}.webp`;
   $("title-img").alt = `Leonor. ${t("e.quote")} ${t("e.cite")}`;
   $("sheet-close").setAttribute("aria-label", t("close"));
-  $("start").setAttribute("aria-label", t("start"));
+  $("prev").setAttribute("aria-label", t("prev"));
+  $("next").setAttribute("aria-label", t("next"));
 }
 
 function setLang(next) {
@@ -305,7 +306,8 @@ window.addEventListener("pointerup", () => {
   walk.addEventListener("click", (ev) => { ev.stopPropagation(); ev.preventDefault(); }, { capture: true, once: true });
 });
 
-$("start").addEventListener("click", () => travel(1));
+$("prev").addEventListener("click", () => travel(current - 1));
+$("next").addEventListener("click", () => travel(current + 1));
 
 // ---------- Everything that follows the visitor: the light, the forest, the line, the address ----------
 function onWalk() {
@@ -326,9 +328,8 @@ function onWalk() {
   document.body.classList.toggle("past-title", walk.scrollLeft > w * 0.3);
   document.body.classList.toggle("at-end", current === lastStop);
 
-  const done = Math.max(0, Math.min(1, (f - 1) / (works.length - 1)));
-  $("route-fill").style.transform = `scaleX(${done})`;
-  $("route").setAttribute("aria-valuenow", Math.round(done * 100));
+  $("prev").hidden = current === 0;
+  $("next").hidden = current === lastStop;
 
   // a reload or the back button returns to the same place on the wall
   const place = current === 0 ? "intro" : current === lastStop ? "gallery" : works[current - 1].slug;

@@ -37,7 +37,6 @@
   <section class="walk" id="walk" hidden>
     <div class="stop title-stop">
       <h1 class="title"><img id="title-img" src="img/title-en.webp" alt=""></h1>
-      <button type="button" class="start" id="start" aria-label="Start"><svg viewBox="0 0 24 48" aria-hidden="true"><path d="M4 4l16 20L4 44"/></svg></button>
     </div>
     <div id="path"></div>
     <div class="stop end-stop">
@@ -47,8 +46,9 @@
   <div class="room-light" aria-hidden="true"></div>
   <div class="veil" aria-hidden="true"></div>
 
-  <!-- A thin bar that fills as you walk the exhibition -->
-  <div class="route" id="route" role="progressbar" aria-valuemin="0" aria-valuemax="100"><span class="route-fill" id="route-fill"></span></div>
+  <!-- Two quiet arrows at the edges of the wall -->
+  <button type="button" class="edge prev" id="prev" aria-label="Previous"><svg viewBox="0 0 24 48" aria-hidden="true"><path d="M20 4L4 24l16 20"/></svg></button>
+  <button type="button" class="edge next" id="next" aria-label="Next"><svg viewBox="0 0 24 48" aria-hidden="true"><path d="M4 4l16 20L4 44"/></svg></button>
 
   <!-- Flyer and letter, opened from the top bar -->
   <div class="sheet" id="sheet" hidden>
