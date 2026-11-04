@@ -14,9 +14,16 @@
   <div class="wall-bg" id="wall-bg" aria-hidden="true"></div>
   <header class="nav">
     <a href="#gallery" class="overview-link" data-i18n="nav.overview">Overview</a>
-    <div class="lang" role="group" aria-label="Language">
-      <button type="button" data-lang="en">EN</button>
-      <button type="button" data-lang="pt">PT</button>
+    <a href="#intro" class="bar-logo"><img src="img/leonor.webp" alt="Leonor"></a>
+    <div class="bar-right">
+      <div class="actions">
+        <button type="button" class="act" data-open="flyer"><span class="leaflet"><img src="img/leonor.webp" alt=""></span><span class="act-label" data-i18n="act.flyer">Flyer</span></button>
+        <button type="button" class="act" data-open="contact"><img class="envelope" src="img/letter.webp" alt=""><span class="act-label" data-i18n="act.contact">Contact</span></button>
+      </div>
+      <div class="lang" role="group" aria-label="Language">
+        <button type="button" data-lang="en">EN</button>
+        <button type="button" data-lang="pt">PT</button>
+      </div>
     </div>
   </header>
 
@@ -26,22 +33,17 @@
     <button class="half pt" data-pick="pt"><span>português</span></button>
   </section>
 
-  <!-- 2. Title wall -->
-  <section class="intro" id="intro" hidden>
-    <div class="intro-text">
-      <h1 class="sig">Leonor.</h1>
-      <blockquote data-i18n="e.quote">It is a truth universally acknowledged, that a young professional in possession of a portfolio must be in want of someone to see it.</blockquote>
-      <p class="cite" data-i18n="e.cite">— The curators</p>
+  <!-- 2. One vertical scroll: the title, then the whole collection rising from below -->
+  <section class="home" id="home" hidden>
+    <div class="hero">
+      <h1 class="title"><img id="title-img" src="img/title-en.webp" alt=""></h1>
     </div>
-    <a href="#gallery" class="arrow next-arrow" id="enter" aria-label="Enter"><svg viewBox="0 0 24 48" aria-hidden="true"><path d="M4 4l16 20L4 44"/></svg></a>
+    <div class="overview" id="gallery">
+      <div class="composition" id="composition"></div>
+    </div>
   </section>
 
-  <!-- 3. The whole collection on one wall -->
-  <section class="overview" id="gallery" hidden>
-    <div class="composition" id="composition"></div>
-  </section>
-
-  <!-- 4. The exhibition: one continuous wall -->
+  <!-- 3. The exhibition: one continuous wall -->
   <section class="exhibit" id="exhibit" hidden>
     <div class="strip" id="strip"></div>
     <button type="button" class="arrow prev-arrow" id="prev" aria-label="Previous"><svg viewBox="0 0 24 48" aria-hidden="true"><path d="M20 4L4 24l16 20"/></svg></button>
@@ -49,40 +51,22 @@
     <p class="counter" id="counter"></p>
   </section>
 
-  <!-- One button on the side opens everything that isn't a painting -->
-  <button type="button" class="info-tab" id="info-tab" aria-controls="drawer" aria-expanded="false"><span data-i18n="info.open">More information</span></button>
+  <!-- Flyer and letter, opened from the top bar -->
+  <div class="sheet" id="sheet" hidden>
+    <div class="sheet-card" id="sheet-card" role="dialog" aria-modal="true">
+      <button class="sheet-close" id="sheet-close" type="button" aria-label="Close">×</button>
 
-  <div class="drawer-backdrop" id="drawer-backdrop"></div>
-  <aside class="drawer" id="drawer" role="dialog" aria-modal="true" aria-labelledby="drawer-title" inert>
-    <button class="drawer-close" id="drawer-close" type="button" aria-label="Close">×</button>
-    <p class="sig" id="drawer-title">Leonor.</p>
-    <nav class="drawer-nav">
-      <button type="button" data-section="flyer" data-i18n="info.flyer">The exhibition</button>
-      <button type="button" data-section="cv" data-i18n="info.cv">Résumé</button>
-      <button type="button" data-section="contact" data-i18n="info.contact">Contact</button>
-    </nav>
+      <div class="flyer-paper" data-sheet="flyer">
+        <img src="img/leonor.webp" alt="Leonor">
+        <p data-i18n="flyer.soon">The exhibition flyer is still at the printer's. Do come back soon.</p>
+      </div>
 
-    <section class="drawer-section" id="info-flyer">
-      <h3 data-i18n="info.flyer">The exhibition</h3>
-      <p class="text" data-i18n="flyer.soon">The exhibition flyer is still at the printer's. Do come back soon.</p>
-    </section>
-
-    <section class="drawer-section" id="info-cv">
-      <h3 data-i18n="info.cv">Résumé</h3>
-      <ul class="cv-links">
-        <li><span data-i18n="info.cvpdf">Résumé (PDF)</span> <em data-i18n="info.soon">coming soon</em></li>
-        <li><span>LinkedIn</span> <em data-i18n="info.soon">coming soon</em></li>
-      </ul>
-    </section>
-
-    <section class="drawer-section" id="info-contact">
-      <h3 data-i18n="info.contact">Contact</h3>
-      <form class="letter" id="letter">
+      <form class="letter" id="letter" data-sheet="contact">
         <!-- Web3Forms: troca pela tua access key (web3forms.com) -->
         <input type="hidden" name="access_key" value="YOUR_WEB3FORMS_KEY">
         <input type="hidden" name="subject" value="New letter from the portfolio">
         <input type="checkbox" name="botcheck" class="hp" tabindex="-1" autocomplete="off">
-        <p class="salutation" data-i18n="mail.dear">Dear Leonor,</p>
+        <p class="salutation">Leonor,</p>
         <label><span data-i18n="mail.name">Your name</span><input name="name" required autocomplete="name"></label>
         <label><span data-i18n="mail.email">Your email</span><input name="email" type="email" required autocomplete="email"></label>
         <label><span data-i18n="mail.msg">Your message</span><textarea name="message" rows="5" required></textarea></label>
@@ -91,8 +75,8 @@
           <p class="status" id="letter-status" role="status"></p>
         </div>
       </form>
-    </section>
-  </aside>
+    </div>
+  </div>
 
   <script src="app.js"></script>
 </body>

@@ -77,18 +77,16 @@ const works = [
 const ui = {
   en: {
     "nav.overview": "← The whole collection",
-    "e.quote": "It is a truth universally acknowledged, that a young professional in possession of a portfolio must be in want of someone to see it.",
+    "e.quote": "It is a truth universally acknowledged, that a young professional in possession of a portfolio must be in want of visitors.",
     "e.cite": "— The curators",
-    "e.enter": "Enter the exhibition",
-    "info.open": "More information", "info.flyer": "The exhibition", "info.cv": "Résumé", "info.contact": "Contact",
-    "info.cvpdf": "Résumé (PDF)", "info.soon": "coming soon",
+    "act.flyer": "Flyer", "act.contact": "Contact",
     "flyer.soon": "The exhibition flyer is still at the printer's. Do come back soon.",
     "guide.open": "Audio guide",
     "guide.soon": "The audio guide is being recorded — coming soon.",
     "label.read": "Read the label",
     "label.write": "Write her a letter →",
     "prev": "Previous work", "next": "Next work", "end": "Back to the whole collection", "close": "Close",
-    "mail.dear": "Dear Leonor,", "mail.name": "Your name", "mail.email": "Your email", "mail.msg": "Your message",
+    "mail.name": "Your name", "mail.email": "Your email", "mail.msg": "Your message",
     "mail.send": "Seal & send", "mail.sending": "Sending…",
     "mail.ok": "Your letter is on its way. Thank you!",
     "mail.err": "The owl got lost. Please try again in a moment.",
@@ -98,16 +96,14 @@ const ui = {
     "nav.overview": "← A coleção completa",
     "e.quote": "É uma verdade universalmente reconhecida que uma jovem profissional, na posse de um portfólio, há de andar à procura de quem o queira ver.",
     "e.cite": "— A curadoria",
-    "e.enter": "Entrar na exposição",
-    "info.open": "Mais informações", "info.flyer": "A exposição", "info.cv": "Currículo", "info.contact": "Contacto",
-    "info.cvpdf": "Currículo (PDF)", "info.soon": "em breve",
+    "act.flyer": "Folheto", "act.contact": "Contacto",
     "flyer.soon": "O folheto da exposição ainda está na gráfica. Volta em breve.",
     "guide.open": "Audioguia",
     "guide.soon": "O audioguia está a ser gravado — em breve.",
     "label.read": "Ler a legenda",
     "label.write": "Escreve-lhe uma carta →",
     "prev": "Obra anterior", "next": "Próxima obra", "end": "Voltar à coleção completa", "close": "Fechar",
-    "mail.dear": "Querida Leonor,", "mail.name": "O teu nome", "mail.email": "O teu email", "mail.msg": "A tua mensagem",
+    "mail.name": "O teu nome", "mail.email": "O teu email", "mail.msg": "A tua mensagem",
     "mail.send": "Selar e enviar", "mail.sending": "A enviar…",
     "mail.ok": "A tua carta já vai a caminho. Obrigada!",
     "mail.err": "A coruja perdeu-se. Tenta outra vez daqui a pouco.",
@@ -127,9 +123,10 @@ function translate(root = document) {
     const text = ui[lang][el.dataset.i18n];
     if (text) el.textContent = text;
   });
-  $("enter").setAttribute("aria-label", t("e.enter"));
+  $("title-img").src = `img/title-${lang}.webp`;
+  $("title-img").alt = `Leonor. ${t("e.quote")} ${t("e.cite")}`;
   $("prev").setAttribute("aria-label", t("prev"));
-  $("drawer-close").setAttribute("aria-label", t("close"));
+  $("sheet-close").setAttribute("aria-label", t("close"));
 }
 
 function setLang(next) {
@@ -143,6 +140,10 @@ function setLang(next) {
   render();
 }
 document.querySelectorAll("[data-lang]").forEach((b) => b.addEventListener("click", () => setLang(b.dataset.lang)));
+
+// How far each painting still has to rise when the page is at the title (% of screen height).
+// The top row stays close, so it peeks in at the bottom of the first screen.
+const rise = { 1: 2, 2: 0, 8: 3, 3: 4, 6: 10, 4: 14, 5: 18, 7: 12 };
 
 // ---------- The whole collection, hung as in Leonor's composition (px on a 1920×1080 wall) ----------
 const hang = {
@@ -159,7 +160,7 @@ const hang = {
 function buildComposition() {
   $("composition").innerHTML = works.map((w) => {
     const h = hang[w.n];
-    return `<a href="#${w.slug}" class="piece" style="left:${h.x / 19.2}%;top:${h.y / 10.8}%;width:${h.w / 19.2}%">
+    return `<a href="#${w.slug}" class="piece" style="left:${h.x / 19.2}%;top:${h.y / 10.8}%;width:${h.w / 19.2}%;--rise:${reduced ? 0 : rise[w.n]}">
       <img src="img/${pad(w.n)}-thumb.webp" alt="${w.title[lang]}">
     </a>`;
   }).join("");
@@ -183,7 +184,7 @@ function buildStrip() {
         <span class="audio-note" role="status">${t("guide.soon")}</span>
       </div>
     </section>`).join("");
-  wireDrawerOpeners($("strip"));
+  wireSheetOpeners($("strip"));
   wireLabels();
 }
 
@@ -302,41 +303,48 @@ window.addEventListener("pointerup", (e) => {
   strip.addEventListener("click", (ev) => { ev.stopPropagation(); ev.preventDefault(); }, { capture: true, once: true });
 });
 
-// ---------- "More information": a drawer from the side with the flyer, résumé and contact ----------
-const drawer = $("drawer");
-const drawerOpen = () => document.body.classList.contains("drawer-open");
+// ---------- Flyer and letter ----------
+const sheetOpen = () => !$("sheet").hidden;
 
-function openDrawer(section) {
+function openSheet(kind) {
   zoomOut();
-  document.body.classList.add("drawer-open");
-  drawer.inert = false;
-  $("info-tab").setAttribute("aria-expanded", "true");
-  if (section) $("info-" + section).scrollIntoView({ block: "start", behavior: reduced ? "instant" : "smooth" });
-  else drawer.scrollTop = 0;
-  $("drawer-close").focus({ preventScroll: true });
+  document.querySelectorAll("[data-sheet]").forEach((el) => (el.hidden = el.dataset.sheet !== kind));
+  $("sheet-card").setAttribute("aria-label", t(kind === "flyer" ? "act.flyer" : "act.contact"));
+  $("sheet").hidden = false;
+  $("sheet-close").focus({ preventScroll: true });
 }
-function closeDrawer() {
-  if (!drawerOpen()) return;
-  document.body.classList.remove("drawer-open");
-  drawer.inert = true;
-  $("info-tab").setAttribute("aria-expanded", "false");
-}
+function closeSheet() { $("sheet").hidden = true; }
 
-function wireDrawerOpeners(root) {
-  root.querySelectorAll("[data-open]").forEach((b) => b.addEventListener("click", (e) => { e.stopPropagation(); openDrawer(b.dataset.open); }));
+function wireSheetOpeners(root) {
+  root.querySelectorAll("[data-open]").forEach((b) => b.addEventListener("click", (e) => { e.stopPropagation(); openSheet(b.dataset.open); }));
 }
-$("info-tab").addEventListener("click", (e) => { e.stopPropagation(); drawerOpen() ? closeDrawer() : openDrawer(); });
-$("drawer-close").addEventListener("click", closeDrawer);
-$("drawer-backdrop").addEventListener("click", closeDrawer);
-drawer.querySelectorAll("[data-section]").forEach((b) => b.addEventListener("click", () => openDrawer(b.dataset.section)));
+wireSheetOpeners(document.querySelector(".actions"));
+$("sheet-close").addEventListener("click", closeSheet);
+$("sheet").addEventListener("click", (e) => { if (e.target === $("sheet")) closeSheet(); });
+
+// ---------- The vertical scroll: title above, collection below ----------
+const home = $("home");
+const wallTop = () => $("gallery").offsetTop;
+
+function onHomeScroll() {
+  if (document.body.dataset.view !== "home") return; // a late scroll event after leaving for a painting
+  const p = Math.min(1, home.scrollTop / wallTop() || 0);
+  document.body.style.setProperty("--p", p.toFixed(3));
+  document.body.classList.toggle("past-hero", p > 0.55);
+  // a reload or the back button returns to the same part of the page
+  const here = p > 0.5 ? "gallery" : "intro";
+  if (location.hash.slice(1) !== here) history.replaceState(null, "", "#" + here);
+}
+home.addEventListener("scroll", () => requestAnimationFrame(onHomeScroll), { passive: true });
 
 document.addEventListener("keydown", (e) => {
-  if (e.key === "Escape") { zoomOut(); return closeDrawer(); }
-  if (drawerOpen()) return;
+  if (e.key === "Escape") { zoomOut(); return closeSheet(); }
+  if (sheetOpen()) return;
   const view = document.body.dataset.view;
   if (view === "exhibit" && e.key === "ArrowRight") { e.preventDefault(); goTo(current + 1); }
   if (view === "exhibit" && e.key === "ArrowLeft") { e.preventDefault(); goTo(current - 1); }
-  if (view === "intro" && (e.key === "ArrowRight" || e.key === "Enter")) location.hash = "gallery";
+  if (view === "home" && ["ArrowDown", "PageDown", " "].includes(e.key)) { e.preventDefault(); showHome("gallery", true); }
+  if (view === "home" && ["ArrowUp", "PageUp"].includes(e.key)) { e.preventDefault(); showHome("intro", true); }
 });
 
 // Letter (Web3Forms)
@@ -358,20 +366,28 @@ form.addEventListener("submit", async (e) => {
 });
 
 // ---------- Views ----------
+function showHome(part, smooth) {
+  home.scrollTo({ top: part === "gallery" ? wallTop() : 0, behavior: smooth && !reduced ? "smooth" : "instant" });
+}
+
 function render() {
   const hash = location.hash.slice(1);
   const i = works.findIndex((x) => x.slug === hash);
-  const view = i >= 0 ? "exhibit" : hash === "gallery" ? "gallery" : hash === "intro" || hash === "entrance" ? "intro" : "splash";
+  const view = i >= 0 ? "exhibit" : ["intro", "gallery", "entrance"].includes(hash) ? "home" : "splash";
   const was = document.body.dataset.view;
   document.body.dataset.view = view;
   $("splash").hidden = view !== "splash";
-  $("intro").hidden = view !== "intro";
-  $("gallery").hidden = view !== "gallery";
+  $("home").hidden = view !== "home";
   $("exhibit").hidden = view !== "exhibit";
-  closeDrawer();
+  closeSheet();
   zoomOut();
-  // On phones the composition is wider than the screen: start in the middle of the wall
-  if (view === "gallery") { const g = $("gallery"); g.scrollLeft = (g.scrollWidth - g.clientWidth) / 2; }
+  if (view === "home") {
+    showHome(hash === "gallery" ? "gallery" : "intro", was === "home");
+    // On phones the composition is wider than the screen: start in the middle of the wall
+    const g = $("gallery");
+    g.scrollLeft = (g.scrollWidth - g.clientWidth) / 2;
+    onHomeScroll();
+  }
   if (view === "exhibit") {
     // Arriving from elsewhere: stand straight in front of the chosen painting
     if (was !== "exhibit" || i !== current) goTo(i, was === "exhibit");
