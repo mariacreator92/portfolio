@@ -34,7 +34,7 @@
   </section>
 
   <!-- 2. One continuous wall: opening text, the eight paintings, then the whole collection -->
-  <div class="floor" aria-hidden="true"></div>
+  <div class="floor" aria-hidden="true"><div class="planks"></div></div>
   <section class="walk" id="walk" hidden>
     <div class="stop title-stop">
       <h1 class="title"><img id="title-img" src="img/title-en.webp" alt=""></h1>
@@ -48,15 +48,8 @@
   <div class="room-light" aria-hidden="true"></div>
   <div class="veil" aria-hidden="true"></div>
 
-  <!-- The line on the floor: where you are in the exhibition -->
-  <nav class="route" id="route" aria-label="Exhibition">
-    <button type="button" class="route-arrow" id="prev" aria-label="Previous"><svg viewBox="0 0 24 48" aria-hidden="true"><path d="M20 4L4 24l16 20"/></svg></button>
-    <div class="route-line">
-      <span class="route-fill" id="route-fill"></span>
-      <ol id="route-dots"></ol>
-    </div>
-    <button type="button" class="route-arrow" id="next" aria-label="Next"><svg viewBox="0 0 24 48" aria-hidden="true"><path d="M4 4l16 20L4 44"/></svg></button>
-  </nav>
+  <!-- A thin bar that fills as you walk the exhibition -->
+  <div class="route" id="route" role="progressbar" aria-valuemin="0" aria-valuemax="100"><span class="route-fill" id="route-fill"></span></div>
 
   <!-- Flyer and letter, opened from the top bar -->
   <div class="sheet" id="sheet" hidden>

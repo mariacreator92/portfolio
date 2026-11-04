@@ -50,7 +50,8 @@ body.at-end .bar-logo { display: block; }
 /* The flyer and the letter arrive once the title has scrolled away */
 .actions { display: flex; align-items: flex-start; gap: clamp(12px, 1.6vw, 24px); }
 .actions, .bar-logo { transition: opacity .5s ease, visibility .5s; }
-body:not(.past-title) .actions { opacity: 0; visibility: hidden; }
+/* Flyer and letter wait at the end of the wall, away from the paintings */
+body:not(.at-end) .actions { opacity: 0; visibility: hidden; }
 .act { display: grid; justify-items: center; gap: 5px; transition: transform .3s; }
 .act:hover { transform: translateY(-3px) rotate(-2deg); }
 .envelope, .leaflet { height: 40px; display: block; filter: drop-shadow(0 5px 8px rgba(0,0,0,.5)); }
@@ -95,10 +96,28 @@ body[data-view="splash"] .nav { display: none; }
 body.zoomed .walk { overflow: hidden; cursor: zoom-out; }
 #path { display: contents; }
 
-/* The floor the wall stands on */
+/* The floor: boards running towards the visitor, seen in perspective, with a skirting along the wall */
 .floor {
-  position: fixed; left: 0; right: 0; bottom: 0; height: 12svh; z-index: -1;
-  background: linear-gradient(#0d0906, #1b130c 45%, #120c07); border-top: 1px solid rgba(214,166,75,.14);
+  position: fixed; left: 0; right: 0; bottom: 0; height: 15svh; z-index: -1; overflow: hidden;
+  perspective: 100svh; perspective-origin: 50% -32svh; background: #1c110a;
+}
+.planks {
+  position: absolute; top: 0; left: -150vw; width: 400vw; height: 60svh; transform-origin: 50% 0;
+  transform: rotateX(90deg) translateX(calc(var(--walked, 0) * -1px));
+  background: repeating-linear-gradient(90deg,
+    #5b3b24 0 98px, #1d1109 98px 100px,
+    #4c3019 100px 198px, #1d1109 198px 200px,
+    #63432a 200px 298px, #1d1109 298px 300px);
+}
+/* the spotlight's pool on the boards, and the shadow where the floor meets the wall */
+.floor::after {
+  content: ""; position: absolute; inset: 0; pointer-events: none;
+  background: radial-gradient(ellipse 34% 120% at 50% 0, rgba(255,205,150,calc(var(--lit, 0) * .3)), transparent 100%),
+    linear-gradient(rgba(6,3,1,.65), rgba(6,3,1,.12) 45%, rgba(6,3,1,.4));
+}
+.floor::before {
+  content: ""; position: absolute; left: 0; right: 0; top: 0; height: 1.5svh; z-index: 1;
+  background: linear-gradient(#3a2819, #1a100a); box-shadow: 0 3px 8px rgba(0,0,0,.7); border-top: 1px solid rgba(214,166,75,.28);
 }
 body[data-view="splash"] :is(.floor, .room-light, .route) { display: none; }
 
@@ -112,11 +131,11 @@ body.zoomed .room-light { opacity: 0; }
 .veil { position: fixed; inset: 0; z-index: 8; pointer-events: none; background: #0a0705; opacity: 0; transition: opacity .32s ease; }
 body.cut .veil { opacity: 1; }
 
-.stop { position: relative; flex: none; height: 88svh; }
+.stop { position: relative; flex: none; height: 85svh; }
 .title-stop { width: 80vw; display: grid; place-items: center; padding-left: 10vw; }
 .title img { display: block; width: min(52vw, 100svh * .86); height: auto; }
 .start { position: absolute; right: 6vw; bottom: 6svh; color: var(--cream); opacity: .85; padding: 10px; transition: opacity .3s, translate .3s; }
-.start svg, .route-arrow svg { display: block; stroke-width: 1.4; }
+.start svg { display: block; stroke-width: 1.4; }
 .start svg { width: 22px; height: 44px; }
 .start:hover { opacity: 1; translate: 4px 0; }
 
@@ -136,13 +155,9 @@ body.zoomed .nav { opacity: 0; pointer-events: none; }
 /* ---------- The paintings: all hung on the same centre line, as in a museum ---------- */
 .work { display: flex; align-items: center; gap: 2.2vw; padding-inline: 7vw; }
 .frame {
-  height: min(calc(var(--s) * 1svh), calc(58vw / var(--ar))); aspect-ratio: var(--ar); width: auto; flex: none;
+  /* one scale for all: the tallest painting fills the wall, the widest still fits the screen */
+  width: calc(var(--w) * min(58vw / 547, 78svh / 507)); aspect-ratio: var(--ar); height: auto; flex: none;
   filter: drop-shadow(0 22px 26px rgba(0,0,0,.65)); will-change: transform; user-select: none; -webkit-user-drag: none;
-}
-/* Each painting's pool of light on the floor moves with the wall */
-.work::after {
-  content: ""; position: absolute; left: 12%; right: 12%; bottom: -9svh; height: 8svh; pointer-events: none;
-  background: radial-gradient(ellipse at 50% 30%, rgba(255,214,160,.13), transparent 70%);
 }
 .label {
   width: clamp(180px, 11vw, 250px); flex: none; align-self: flex-end; margin-bottom: 14svh;
@@ -162,31 +177,13 @@ body.zoomed .nav { opacity: 0; pointer-events: none; }
 .audio-note { font-style: italic; text-align: right; opacity: 0; margin-top: -1em; transition: opacity .4s; }
 .audio-note.show { opacity: .85; }
 
-/* ---------- The line on the floor: where you are in the exhibition ---------- */
+/* ---------- The bar: how far along the exhibition you are ---------- */
 .route {
-  position: fixed; left: 50%; bottom: 3.4svh; translate: -50% 0; z-index: 6; width: min(620px, 70vw);
-  display: flex; align-items: center; gap: 22px; transition: opacity .5s ease, visibility .5s;
+  position: fixed; left: 50%; bottom: 3svh; translate: -50% 0; z-index: 6; width: min(340px, 44vw); height: 2px;
+  background: rgba(243,234,215,.22); transition: opacity .5s ease, visibility .5s;
 }
 body:not(.past-title) .route, body.zoomed .route { opacity: 0; visibility: hidden; }
-.route-arrow { color: var(--cream); opacity: .8; padding: 6px 8px; transition: opacity .3s; }
-.route-arrow:hover { opacity: 1; }
-.route-arrow svg { width: 11px; height: 22px; }
-.route-line { position: relative; flex: 1; height: 1px; background: rgba(243,234,215,.25); }
 .route-fill { position: absolute; inset: 0; background: var(--gold); transform: scaleX(0); transform-origin: left; }
-.route ol { list-style: none; position: absolute; inset: 0; }
-.route li { position: absolute; top: 0; }
-.route li button { position: absolute; left: -14px; top: -12px; width: 28px; height: 40px; display: block; }
-.r-dot { position: absolute; left: 11px; top: 9px; width: 7px; height: 7px; border-radius: 50%; background: #5a4c3a; transition: background .3s, transform .3s; }
-.r-no { position: absolute; left: 0; right: 0; top: 22px; text-align: center; font: 12px/1 var(--serif); color: var(--muted); transition: color .3s; }
-.r-name {
-  position: absolute; bottom: 36px; left: 50%; translate: -50% 4px; white-space: nowrap; pointer-events: none;
-  font: italic 16px/1 var(--serif); color: var(--cream); text-shadow: 0 1px 8px rgba(0,0,0,.9);
-  opacity: 0; transition: opacity .3s, translate .3s;
-}
-.route li.done .r-dot { background: var(--gold); }
-.route li.here .r-dot { background: var(--gold); transform: scale(1.6); }
-.route li.here .r-no { color: var(--cream); }
-.route li.here .r-name, .route li button:hover .r-name { opacity: 1; translate: -50% 0; }
 
 /* ---------- Flyer and letter ---------- */
 .sheet {
@@ -243,16 +240,14 @@ body:not(.past-title) .route, body.zoomed .route { opacity: 0; visibility: hidde
   .title img { width: 90vw; }
   .start { right: 14px; bottom: 11svh; }
   .work { width: 100vw; flex-direction: column; align-items: center; gap: 16px; padding: 72px 16px 90px; overflow-y: auto; }
-  .work::after { display: none; }
-  .frame { height: auto; width: min(100%, calc(56svh * var(--ar))); }
+  .frame { width: calc(var(--w) * min(88vw / 547, 54svh / 507)); }
   .label { width: 100%; max-width: 460px; margin: 0; align-self: center; font-size: 15px; line-height: 1.45; cursor: default; }
   /* The whole collection is wider than the phone: it pans along */
   .end-stop { padding-inline: 16px; }
   .composition { width: calc(78svh * 16 / 9); }
   .phones svg { width: 22px; height: 22px; }
   .audio-note { margin-top: -.6em; }
-  .route { width: calc(100vw - 32px); gap: 8px; bottom: 34px; }
-  .r-name { display: none; }
+  .route { width: 60vw; bottom: 18px; }
   .letter { padding: 26px 20px; }
 }
 @media (prefers-reduced-motion: reduce) {

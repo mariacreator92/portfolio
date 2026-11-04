@@ -76,7 +76,7 @@ const works = [
 
 const ui = {
   en: {
-    "nav.overview": "See all the works", "start": "Start the visit", "prev": "Previous work", "next": "Next work",
+    "nav.overview": "See all the works", "start": "Start the visit",
     "e.quote": "It is a truth universally acknowledged, that a young professional in possession of a portfolio must be in want of visitors.",
     "e.cite": "— The curators",
     "act.flyer": "Flyer", "act.contact": "Contact",
@@ -93,7 +93,7 @@ const ui = {
     "mail.off": "The post office isn't open yet — this form will work soon.",
   },
   pt: {
-    "nav.overview": "Ver todas as obras", "start": "Começar a visita", "prev": "Obra anterior", "next": "Próxima obra",
+    "nav.overview": "Ver todas as obras", "start": "Começar a visita",
     "e.quote": "É uma verdade universalmente reconhecida que uma jovem profissional, na posse de um portfólio, há de andar à procura de quem o queira ver.",
     "e.cite": "— A curadoria",
     "act.flyer": "Folheto", "act.contact": "Contacto",
@@ -127,8 +127,6 @@ function translate(root = document) {
   $("title-img").alt = `Leonor. ${t("e.quote")} ${t("e.cite")}`;
   $("sheet-close").setAttribute("aria-label", t("close"));
   $("start").setAttribute("aria-label", t("start"));
-  $("prev").setAttribute("aria-label", t("prev"));
-  $("next").setAttribute("aria-label", t("next"));
 }
 
 function setLang(next) {
@@ -165,8 +163,8 @@ function buildComposition() {
 }
 
 // ---------- The exhibition: one continuous wall ----------
-// How tall each painting hangs (% of screen height) and its proportions, so nothing jumps while images load
-const size = { 1: 72, 2: 80, 3: 74, 4: 72, 5: 66, 6: 74, 7: 62, 8: 74 };
+// Each painting's proportions, so nothing jumps while images load. Its size comes from the composition
+// above (--w), so the paintings keep the same scale against each other on the wall.
 const ratio = { 1: 1.1109, 2: 0.6599, 3: 0.7293, 4: 0.9648, 5: 1.2827, 6: 0.7633, 7: 1.362, 8: 0.7552 };
 
 const walk = $("walk");
@@ -178,7 +176,7 @@ function buildPath() {
   $("path").innerHTML = works.map((w) => `
     <section class="stop work" data-slug="${w.slug}" aria-label="${w.n}. ${w.title[lang]}">
       <img class="frame" src="img/${pad(w.n)}-frame.webp" srcset="img/${pad(w.n)}-frame.webp 1300w, img/${pad(w.n)}-frame-xl.webp 2000w" sizes="(max-width: 860px) 90vw, 58vw"
-        alt="${w.title[lang]}" style="--s:${size[w.n]};--ar:${ratio[w.n]}" loading="${w.n <= 2 ? "eager" : "lazy"}" draggable="false">
+        alt="${w.title[lang]}" style="--w:${hang[w.n].w};--ar:${ratio[w.n]}" loading="${w.n <= 2 ? "eager" : "lazy"}" draggable="false">
       <div class="label" tabindex="0" role="button" aria-label="${t("label.read")}">
         <span class="l-head"><b>${w.title[lang]}.</b> ${w.medium[lang]}<br>${w.year}</span>
         <span class="l-text">${w.text[lang]}</span>
@@ -191,12 +189,6 @@ function buildPath() {
     </section>`).join("");
   wireSheetOpeners($("path"));
   wireLabels();
-
-  $("route-dots").innerHTML = works.map((w, i) => `
-    <li style="left:${(i / (works.length - 1)) * 100}%"><button type="button" data-stop="${i + 1}" aria-label="${w.n}. ${w.title[lang]}">
-      <span class="r-name">${w.title[lang]}</span><span class="r-dot"></span><span class="r-no">${w.n}</span>
-    </button></li>`).join("");
-  $("route-dots").querySelectorAll("[data-stop]").forEach((b) => b.addEventListener("click", () => travel(+b.dataset.stop)));
 
   $("flyer-list").innerHTML = works.map((w, i) => `<li><button type="button" data-visit="${i + 1}">${w.title[lang]}</button></li>`).join("");
   $("flyer-list").querySelectorAll("[data-visit]").forEach((b) => b.addEventListener("click", () => {
@@ -292,8 +284,6 @@ window.addEventListener("pointerup", () => {
 });
 
 $("start").addEventListener("click", () => travel(1));
-$("prev").addEventListener("click", () => travel(current - 1));
-$("next").addEventListener("click", () => travel(current + 1));
 
 // ---------- Everything that follows the visitor: the light, the forest, the line, the address ----------
 function onWalk() {
@@ -310,15 +300,14 @@ function onWalk() {
   document.body.style.setProperty("--lit", lit.toFixed(3));
   // the forest is further away, so it slides past more slowly
   document.body.style.setProperty("--along", (walk.scrollLeft / (maxLeft() || 1)).toFixed(4));
+  // the floorboards pass at the same speed as the wall
+  document.body.style.setProperty("--walked", (walk.scrollLeft % 300).toFixed(1));
   document.body.classList.toggle("past-title", walk.scrollLeft > w * 0.3);
   document.body.classList.toggle("at-end", current === lastStop);
 
-  const n = works.length;
-  $("route-fill").style.transform = `scaleX(${Math.max(0, Math.min(1, (f - 1) / (n - 1)))})`;
-  $("route-dots").querySelectorAll("li").forEach((li, i) => {
-    li.classList.toggle("here", i + 1 === current);
-    li.classList.toggle("done", i + 1 <= f);
-  });
+  const done = Math.max(0, Math.min(1, (f - 1) / (works.length - 1)));
+  $("route-fill").style.transform = `scaleX(${done})`;
+  $("route").setAttribute("aria-valuenow", Math.round(done * 100));
 
   // a reload or the back button returns to the same place on the wall
   const place = current === 0 ? "intro" : current === lastStop ? "gallery" : works[current - 1].slug;
